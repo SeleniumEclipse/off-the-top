@@ -1,0 +1,660 @@
+# Everyday Things
+
+# Furniture And Household Objects
+Sofa
+Armchair
+Coffee Table
+Bookshelf
+Dresser
+Wardrobe
+Bed Frame
+Mattress
+Pillow
+Bed Sheet
+Blanket
+Rug
+Curtains
+Window Blinds
+Lampshade
+Mirror
+Wall Clock
+Picture Frame
+Vase
+Candle
+Doorstop
+Doormat
+Coat Rack
+Hanger
+Fire Extinguisher
+Ottoman
+Folding Screen
+Doorbell
+Key
+Light Bulb
+
+# Cleaning And Laundry
+Broom
+Dustpan
+Mop
+Bucket
+Sponge
+Feather Duster
+Scrub Brush
+Rubber Gloves
+Dish Soap
+Laundry Detergent
+Bleach
+Fabric Softener
+Stain Remover
+Lint Roller
+Clothespin
+Clothesline
+Laundry Basket
+Ironing Board
+Squeegee
+Toilet Brush
+Plunger
+Trash Can
+Trash Bag
+Paper Towel
+Cleaning Rag
+Shoe Polish
+Fly Swatter
+Drain Cleaner
+Drying Rack
+Spray Bottle
+
+# Kitchen Tools
+Kitchen Knife
+Cutting Board
+Vegetable Peeler
+Grater
+Whisk
+Spatula
+Ladle
+Tongs
+Colander
+Measuring Cup
+Can Opener
+Bottle Opener
+Corkscrew
+Pizza Cutter
+Garlic Press
+Potato Masher
+Nutcracker
+Salad Spinner
+Funnel
+Egg Timer
+Meat Thermometer
+Mortar And Pestle
+Rolling Pin
+Pastry Brush
+Cookie Cutter
+Piping Bag
+Ice Cream Scoop
+Melon Baller
+Skewer
+Oven Mitt
+
+# Cookware And Tableware
+Frying Pan
+Saucepan
+Wok
+Baking Sheet
+Cake Tin
+Muffin Tray
+Casserole Dish
+Steamer Basket
+Bread Basket
+Cooling Rack
+Trivet
+Pot Lid
+Splatter Guard
+Plate
+Bowl
+Mug
+Wine Glass
+Pitcher
+Teapot
+Fork
+Spoon
+Chopsticks
+Napkin
+Tablecloth
+Coaster
+Serving Tray
+Gravy Boat
+Egg Cup
+Butter Dish
+Lunchbox
+
+# Household Appliances
+Refrigerator
+Freezer
+Oven
+Microwave
+Toaster
+Kettle
+Blender
+Food Processor
+Stand Mixer
+Coffee Maker
+Coffee Grinder
+Juicer
+Rice Cooker
+Slow Cooker
+Pressure Cooker
+Air Fryer
+Waffle Iron
+Sandwich Press
+Popcorn Maker
+Dishwasher
+Washing Machine
+Tumble Dryer
+Vacuum Cleaner
+Steam Iron
+Sewing Machine
+Electric Fan
+Air Conditioner
+Humidifier
+Kitchen Scale
+Space Heater
+
+# Bathroom And Personal Care
+Toothbrush
+Toothpaste
+Dental Floss
+Mouthwash
+Soap Bar
+Shampoo
+Conditioner
+Body Lotion
+Deodorant
+Razor
+Shaving Cream
+Hairbrush
+Comb
+Hair Dryer
+Curling Iron
+Hair Straightener
+Nail Clippers
+Nail File
+Tweezers
+Cotton Swab
+Tampon
+Tissue
+Toilet Paper
+Towel
+Sanitary Pad
+Shower Curtain
+Showerhead
+Sunscreen
+Lip Balm
+Lipstick
+Mascara
+Perfume
+Adhesive Bandage
+First Aid Kit
+Hot Water Bottle
+
+# Ingredients And Condiments
+Flour
+Sugar
+Salt
+Black Pepper
+Baking Soda
+Cornstarch
+Butter
+Cooking Oil
+Vinegar
+Soy Sauce
+Ketchup
+Mustard
+Mayonnaise
+Hot Sauce
+Barbecue Sauce
+Pesto
+Salad Dressing
+Honey
+Maple Syrup
+Jam
+Peanut Butter
+Cream Cheese
+Sour Cream
+Curry Paste
+Yogurt
+Breadcrumbs
+Gelatin
+Vanilla Extract
+Cocoa Powder
+Food Coloring
+Chocolate Chips
+Gravy
+Custard
+Hummus
+Salsa
+
+# Meals And Savory Snacks
+Baked Beans
+Bagel
+Croissant
+Pretzel
+Cracker
+Tortilla
+Pita Bread
+Falafel
+Pancake
+Waffle
+Omelet
+Scrambled Eggs
+Hash Browns
+Porridge
+Granola
+Sandwich
+Burger
+Hot Dog
+Pizza
+Taco
+Burrito
+Quesadilla
+Nachos
+Lasagna
+Ravioli
+Spaghetti
+Macaroni And Cheese
+Ramen
+Dumpling
+Spring Roll
+Sushi
+Fried Rice
+Risotto
+Curry
+Stew
+Mashed Potatoes
+French Fries
+Meatball
+Bacon
+Popcorn
+
+# Sweets And Desserts
+Cheesecake
+Cupcake
+Cookie
+Brownie
+Doughnut
+Muffin
+Eclair
+Apple Pie
+Cinnamon Roll
+Gingerbread
+Pudding
+Ice Cream
+Sorbet
+Ice Pop
+Fudge
+Caramel
+Marshmallow
+Cotton Candy
+Lollipop
+Jelly Bean
+Chocolate Bar
+Chewing Gum
+Baklava
+Churro
+Macaron
+
+# Drinks
+Bottled Water
+Milk
+Orange Juice
+Lemonade
+Hot Chocolate
+Coffee
+Tea
+Milkshake
+Smoothie
+Soda
+Energy Drink
+Eggnog
+Beer
+Wine
+Cider
+
+# Clothing
+T-Shirt
+Dress Shirt
+Blouse
+Sweater
+Hoodie
+Cardigan
+Jacket
+Raincoat
+Jeans
+Trousers
+Shorts
+Skirt
+Dress
+Suit
+Overalls
+Leggings
+Tracksuit
+Pajamas
+Nightgown
+Bathrobe
+Underwear
+Bra
+Socks
+Tights
+Swimsuit
+Wetsuit
+Apron
+Poncho
+Waistcoat
+Kilt
+Tutu
+Leotard
+
+# Wearable Accessories And Footwear
+Belt
+Necktie
+Suspenders
+Scarf
+Gloves
+Baseball Cap
+Sunglasses
+Eyeglasses
+Wristwatch
+Ring
+Necklace
+Bracelet
+Earrings
+Brooch
+Cufflinks
+Hair Clip
+Headband
+Hair Tie
+Wig
+Sneakers
+Sandals
+Boots
+Slippers
+High Heels
+Lanyard
+
+# Bags And Travel Essentials
+Backpack
+Suitcase
+Handbag
+Wallet
+Umbrella
+Passport
+Boarding Pass
+Luggage Tag
+Travel Adapter
+Sleeping Bag
+Tent
+Compass
+Map
+Earplugs
+Sleep Mask
+Vacuum Flask
+Binoculars
+Padlock
+Hammock
+Cooler
+
+# Hand Tools And Power Tools
+Hammer
+Screwdriver
+Wrench
+Pliers
+Allen Key
+Tape Measure
+Spirit Level
+Hacksaw
+Chisel
+Metal File
+Sandpaper
+Hand Plane
+Clamp
+Vise
+Crowbar
+Utility Knife
+Scissors
+Bolt Cutters
+Wire Strippers
+Staple Gun
+Glue Gun
+Soldering Iron
+Power Drill
+Chainsaw
+Angle Grinder
+Paintbrush
+Paint Roller
+Paint Scraper
+Caulking Gun
+Trowel
+
+# Hardware And Workshop Supplies
+Nail
+Screw
+Nut And Bolt
+Circuit Breaker
+Hinge
+Door Handle
+Hook
+Chain
+Rope
+Cable Tie
+Duct Tape
+Extension Cord
+Power Strip
+Fuse
+Light Switch
+Carabiner
+Pulley
+Coil Spring
+Gear
+Pipe
+Hose
+Faucet
+Toolbox
+Ladder
+Wheelbarrow
+Shovel
+Rake
+Bungee Cord
+Safety Goggles
+Hard Hat
+
+# Electronics And Gadgets
+Smartphone
+Tablet
+Laptop
+Desktop Computer
+Keyboard
+Computer Mouse
+Monitor
+Printer
+Scanner
+Microphone
+Speaker
+Headphones
+Television
+Remote Control
+Game Controller
+Game Console
+Router
+USB Cable
+Flash Drive
+Memory Card
+Hard Drive
+Battery
+Phone Charger
+Camera
+Tripod
+Projector
+Calculator
+Smoke Detector
+Walkie-Talkie
+Record Player
+
+# Stationery And Craft Supplies
+Pen
+Pencil
+Eraser
+Pencil Sharpener
+Crayon
+Marker
+Chalkboard
+Highlighter
+Ruler
+Notebook
+Binder
+File Folder
+Envelope
+Postage Stamp
+Paper Clip
+Stapler
+Staple Remover
+Thumbtack
+Rubber Band
+Sticky Note
+Index Card
+Clipboard
+Calendar
+Glue Stick
+Wrapping Paper
+Ribbon
+Yarn
+Sewing Needle
+Thimble
+Crochet Hook
+Embroidery Hoop
+Paint Palette
+Modeling Clay
+Canvas
+Protractor
+
+# Musical Instruments
+Piano
+Guitar
+Violin
+Cello
+Harp
+Ukulele
+Banjo
+Mandolin
+Trumpet
+Trombone
+Tuba
+French Horn
+Saxophone
+Clarinet
+Flute
+Recorder
+Harmonica
+Accordion
+Bagpipes
+Drum Kit
+Tambourine
+Cymbals
+Xylophone
+Maracas
+Triangle
+
+# Vehicles And Transport
+Car
+Bus
+Motorcycle
+Scooter
+Bicycle
+Unicycle
+Wheelchair
+Ambulance
+Fire Engine
+Garbage Truck
+Dump Truck
+Pickup Truck
+Tractor
+Forklift
+Bulldozer
+Excavator
+Cement Mixer
+Road Roller
+Train
+Tram
+Airplane
+Helicopter
+Hot Air Balloon
+Sailboat
+Canoe
+Ferry
+Submarine
+Hovercraft
+Cable Car
+Camper Van
+
+# Sports Equipment
+Soccer Ball
+Basketball
+Baseball
+Tennis Ball
+Rugby Ball
+Bicycle Helmet
+Bowling Ball
+Golf Club
+Baseball Bat
+Cricket Bat
+Tennis Racket
+Shuttlecock
+Table Tennis Paddle
+Hockey Stick
+Hockey Puck
+Lacrosse Stick
+Fishing Rod
+Boxing Glove
+Punching Bag
+Skipping Rope
+Dumbbell
+Resistance Band
+Yoga Mat
+Skateboard
+Roller Skates
+Ice Skates
+Ski
+Snowboard
+Surfboard
+Life Jacket
+
+# Toys And Game Pieces
+Doll
+Teddy Bear
+Puppet
+Rocking Horse
+Dollhouse
+Building Blocks
+Spinning Top
+Yo-Yo
+Kite
+Hula Hoop
+Marble Run
+Jigsaw Puzzle
+Domino
+Dice
+Playing Cards
+Chessboard
+Poker Chip
+Bingo Cage
+Kaleidoscope
+Water Pistol
+Water Balloon
+Bubble Wand
+Jack-In-The-Box
+Beanbag
+Action Figure
+Pinwheel
+Fidget Spinner
+Pogo Stick
+Dartboard
+Foosball Table
