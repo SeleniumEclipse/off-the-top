@@ -1,12 +1,14 @@
-# Release validation — Off the Top 1.2.0
+# Release validation — Off the Top 1.3.0
 
-## Current change: less copy and a layered dark background
+## Current change: flat color, vector icons, no decorative filler
 
-- Removed redundant marketing text and repeated headers from home, practice, countdown, gameplay, pause and results. Shortened settings/help. Tilt diagnostics moved behind a Tilt setup control.
-- Kept the existing one-accent teal palette. Dark mode now uses cached static linear/radial shading, dark shadows and muted outlines; the readable clue surface remains opaque.
-- No changes to AppModel, RoundEngine, TiltDetector, MotionFilter or deck files. Existing gameplay, history, settings and motion assertions remain; UI assertions now use the shorter visible labels and accessible answer descriptions.
-- Added QuietUiTest (3 flows): clean home/help, optional diagnostics/reset, and compact touch gameplay through review/persistence.
-- Added BackgroundAppearanceTest (3 rendered-image tests): day stays uniform, night visibly varies without animating and preserves >4.5 text contrast at sampled points, and solid card surfaces cover the gradient. These sample actual Android-rendered pixels, not an imitation of the gradient math.
+- Removed the gradient/glow implementation and its color tokens entirely. Both themes use a single opaque background fill; cards keep a distinct solid fill.
+- Removed decorative deck/phone illustrations, deck subtitles, redundant button arrows, automatic setting subtext and unused display-label helpers.
+- Replaced text-glyph icons with the official Compose Material Icons Sharp vectors. Action labels and accessible outcome meanings remain. Real pixel checks prove vector icons render, rather than merely deleting their old text.
+- No changes to AppModel, RoundEngine, TiltDetector, MotionFilter or deck files. Existing gameplay, history, settings and motion assertions remain.
+- DesignGuardrailTest adds four project-specific source rules: no gradient/glow graphics APIs, no emoji/glyph UI icons, no removed filler/illustration helpers, and a consistent vector set. These are the user's design choices, not universal claims about all UI.
+- BackgroundAppearanceTest retains three rendered-image tests, now requiring flat, opaque, static colors and contrast >=4.5 in both themes; actual Android pixels are checked.
+- Research and explicit keep/remove decisions are documented with sources in DESIGN.md.
 
 ## Previous motion regression (fixed in 1.1.0, retained)
 
@@ -14,7 +16,7 @@ The user reported intermittent pass gestures and no successful downward correct 
 
 The new detector learns a stable starting angle, triggers at relative ±28° (gentle ±20°), tracks center returns throughout feedback, and keeps an unfinished late countdown placement pending until stable. The sensor adapter uses sensor timestamps and short, time-based accelerometer smoothing instead of relying first on manufacturer-specific gravity-filter delay.
 
-The single teal accent replaces all three former accents. Navy/ivory neutrals, glyphs and labels distinguish pass/correct without needing separate accent colors. Actual text and icon contrast is unit tested.
+The single teal accent replaces all three former accents. Navy/ivory neutrals, vectors and labels distinguish pass/correct without needing separate accent colors. Actual text and icon contrast is tested.
 
 ## Environment and result
 
@@ -28,12 +30,12 @@ The single teal accent replaces all three former accents. Navy/ivory neutrals, g
 
 | Check | Result | Exit code | Evidence |
 |---|---|---:|---|
-| Pure engine, motion, theme and data tests | 130 passed, 0 failed | 0 | 50 round, 61 detector, 9 filter, 2 physical-regression, 3 contrast, 5 deck tests |
+| Pure engine, motion, theme, data and design tests | 134 passed, 0 failed | 0 | 50 round, 61 detector, 9 filter, 2 physical-regression, 3 contrast, 5 deck, 4 design-guardrail tests |
 | Android UI, model and rendered-background tests | 22 passed, 0 failed, 0 skipped | 0 | Existing five test classes plus QuietUiTest and BackgroundAppearanceTest |
 | Copy and accessible outcomes | PASS | 0 | No repeated slogans or expanded diagnostics by default; icon-only answers keep accessible outcome descriptions and correction behavior |
-| Layered background | PASS | 0 | Actual pixel captures verify visible night variation, no one-second animation, opaque card surfaces and sampled text contrast |
+| Flat backgrounds and vector icons | PASS | 0 | Actual pixel captures verify uniform opaque backgrounds, no one-second animation, solid card surfaces, text contrast and painted vectors |
 | Long-card layout cases | 108 fitting renders, plus overflow/recovery checks | 0 | 36 longest entries × 3 viewport/font-size combinations; actual AutoWord renderer |
-| Release lint | 0 errors; 10 advisory warnings | 0 | Version update notices, intentional landscape orientation, retained license resource |
+| Release lint | 0 errors; 10 advisory warnings | 0 | Eight dependency update notices, intentional landscape orientation, older-Android backup configuration advice |
 | Signed release build | PASS | 0 | R8 minification and resource shrinking enabled |
 | APK update installation and cold launch | PASS | 0 | Actual signed release installed over previous version without clearing data |
 | APK signature | PASS | 0 | apksigner verifies v2 signature, suitable for min Android 8 |
@@ -45,6 +47,7 @@ The single teal accent replaces all three former accents. Navy/ivory neutrals, g
 
 ## Critical defects caught and fixed
 
+- During the icon refactor, accessible live score stayed at zero while visible score updated. Tests caught it; the semantics now capture an immutable score value and match the displayed number after scoring.
 - Normal resting holds and downward nods rejected by absolute-angle gates: now calibrated relative angles, with faster center and tilt dwell times.
 - Feedback and countdown transitions discarded motion readiness: now continuous tracking with a separate visible-card scoring gate.
 - Late forehead placement could preserve an early handheld baseline: pending calibration now completes across countdown end before scoring.

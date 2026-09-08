@@ -30,7 +30,7 @@ class SettingsFlowTest : OffTheTopUiTest() {
         setToggle("Vibration", true)
         setToggle("Touch-only mode", false)
         setToggle("Gentle tilts", false)
-        tapText("‹ Back")
+        tapText("Back")
         tapText("Settings", scroll = true)
         compose.activityRule.scenario.recreate()
         awaitText("Settings")
@@ -70,13 +70,13 @@ class SettingsFlowTest : OffTheTopUiTest() {
             onModel { assertEquals(120, it.seconds) }
         }
 
-        tapText("‹ Back")
+        tapText("Back")
         tapText("30s")
         chooseDeck("Everyday Things")
         val deckSize = onModel { it.selected.words.size }
         compose.onNodeWithTag("round-options").assertIsDisplayed().assertTextEquals("30s · $deckSize unseen")
         compose.activityRule.scenario.recreate()
-        awaitText("Start round  →")
+        awaitText("Start round")
         compose.onNodeWithTag("round-options").assertIsDisplayed().assertTextEquals("30s · $deckSize unseen")
         withReloadedModel { assertEquals(30, it.seconds) }
         onModel { assertTrue(it.history.isEmpty()) }
@@ -92,19 +92,19 @@ class SettingsFlowTest : OffTheTopUiTest() {
         compose.onNodeWithText("Leaving the app pauses the timer. Resume resets your tilt.").assertIsDisplayed()
         compose.activityRule.scenario.recreate()
         awaitText("How to play")
-        tapText("‹ Back")
+        tapText("Back")
         tapText("Recent rounds", scroll = true)
         awaitText("Recent rounds")
         compose.onNodeWithText(EMPTY_HISTORY).assertIsDisplayed()
-        compose.onNodeWithText("+").assertDoesNotExist()
-        compose.onNodeWithText("−").assertDoesNotExist()
+        compose.onNodeWithContentDescription("Expand answers").assertDoesNotExist()
+        compose.onNodeWithContentDescription("Collapse answers").assertDoesNotExist()
         compose.activityRule.scenario.recreate()
         awaitText("Recent rounds")
         compose.onNodeWithText(EMPTY_HISTORY).assertIsDisplayed()
         withReloadedModel { assertTrue(it.history.isEmpty()) }
-        tapText("‹ Back")
+        tapText("Back")
         chooseDeck("Do Your Thing")
-        compose.onNodeWithText("Start round  →").assertIsEnabled()
+        compose.onNodeWithText("Start round").assertIsEnabled()
         onModel { assertTrue(it.history.isEmpty()) }
     }
 

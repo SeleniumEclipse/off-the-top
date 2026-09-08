@@ -113,15 +113,15 @@ class GameplayFlowTest : OffTheTopUiTest() {
         tapText("Recent rounds", scroll = true)
         val reviewedHistory = hasClickAction() and hasText("Wild World") and hasText("2")
         compose.onNode(reviewedHistory).performScrollTo().assertIsDisplayed()
-            .assertTextContains("+").performClick()
+            .assertContentDescriptionEquals("Expand answers").performClick()
         assertHistoryAnswer(first, Outcome.PASS)
         assertHistoryAnswer(second, Outcome.CORRECT)
         assertHistoryAnswer(third, Outcome.CORRECT)
         compose.onAllNodes(hasContentDescription(", Correct", substring = true)).assertCountEquals(2)
         compose.onAllNodes(hasContentDescription(", Passed", substring = true)).assertCountEquals(1)
         compose.onAllNodes(hasContentDescription(", Unanswered", substring = true)).assertCountEquals(0)
-        compose.onNode(reviewedHistory).assertTextContains("−").performScrollTo().performClick()
-        compose.onNode(reviewedHistory).assertTextContains("+")
+        compose.onNode(reviewedHistory).assertContentDescriptionEquals("Collapse answers").performScrollTo().performClick()
+        compose.onNode(reviewedHistory).assertContentDescriptionEquals("Expand answers")
         compose.onNodeWithText(first).assertDoesNotExist()
         compose.onNodeWithText(second).assertDoesNotExist()
         compose.onNodeWithText(third).assertDoesNotExist()
@@ -140,7 +140,7 @@ class GameplayFlowTest : OffTheTopUiTest() {
                 .assertTextEquals("Touch controls")
             compose.onNodeWithTag("round-options").assertIsDisplayed()
                 .assertTextEquals("60s · ${deck.words.size} unseen")
-            compose.onNodeWithText("Start round  →").assertIsEnabled()
+            compose.onNodeWithText("Start round").assertIsEnabled()
             compose.onNodeWithTag("word").assertDoesNotExist()
             compose.onNodeWithTag("live-score").assertDoesNotExist()
             onModel { model ->
@@ -150,7 +150,7 @@ class GameplayFlowTest : OffTheTopUiTest() {
                 assertEquals(deck.words.size, model.unseen(deck))
             }
             assertTrue(seenWords(deck.id).isEmpty())
-            tapText("‹ Back")
+            tapText("Back")
             awaitText("Choose a deck")
         }
         tapText("Recent rounds", scroll = true)
@@ -235,7 +235,7 @@ abstract class OffTheTopUiTest {
     protected fun chooseDeck(title: String) {
         compose.onNode(hasScrollToNodeAction()).performScrollToNode(hasText(title))
         tapText(title)
-        awaitText("Start round  →")
+        awaitText("Start round")
         onModel { assertEquals(title, it.selected.title) }
     }
 
@@ -244,7 +244,7 @@ abstract class OffTheTopUiTest {
         setToggle("Touch-only mode", true)
         setToggle("Sound effects", false)
         setToggle("Vibration", false)
-        tapText("‹ Back")
+        tapText("Back")
     }
 
     protected fun setToggle(label: String, enabled: Boolean) {
@@ -260,7 +260,7 @@ abstract class OffTheTopUiTest {
     }
 
     protected fun startAndAwaitWord(seconds: Int): String {
-        tapText("Start round  →")
+        tapText("Start round")
         assertCountdown()
         onModel { assertEquals(seconds, it.round?.durationSeconds) }
         return awaitWord()
@@ -320,12 +320,15 @@ abstract class OffTheTopUiTest {
 
     protected fun assertLiveScore(score: Int) {
         compose.onNodeWithTag("live-score").assertIsDisplayed()
-            .assertTextEquals("✓ $score").assertContentDescriptionEquals("$score correct")
+            .assertTextEquals("$score").assertContentDescriptionEquals("$score correct")
         onModel { assertEquals(score, it.round?.score) }
     }
 
     protected fun assertAnswer(index: Int, word: String, outcome: Outcome) {
-        assertAnswerRow(compose.onNodeWithTag("answer-$index").assertHasClickAction(), word, outcome)
+        val row = compose.onNodeWithTag("answer-$index").assertHasClickAction()
+        assertAnswerRow(row, word, outcome)
+        assertEquals("Review must explain its action to accessibility services", "Change result",
+            row.fetchSemanticsNode().config[SemanticsActions.OnClick].label)
         onModel { assertEquals(Answer(word, outcome), checkNotNull(it.round).answers[index]) }
     }
 
@@ -334,12 +337,12 @@ abstract class OffTheTopUiTest {
     }
 
     private fun assertAnswerRow(row: SemanticsNodeInteraction, word: String, outcome: Outcome) {
-        val (glyph, description) = when (outcome) {
-            Outcome.CORRECT -> "✓" to "Correct"
-            Outcome.PASS -> "↷" to "Passed"
-            Outcome.UNANSWERED -> "—" to "Unanswered"
+        val description = when (outcome) {
+            Outcome.CORRECT -> "Correct"
+            Outcome.PASS -> "Passed"
+            Outcome.UNANSWERED -> "Unanswered"
         }
-        row.performScrollTo().assertIsDisplayed().assertTextEquals(word, glyph)
+        row.performScrollTo().assertIsDisplayed().assertTextEquals(word)
             .assertContentDescriptionEquals("$word, $description")
     }
 

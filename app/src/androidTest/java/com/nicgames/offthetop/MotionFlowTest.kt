@@ -1,6 +1,6 @@
 package com.nicgames.offthetop
 
-import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlin.math.cos
 import kotlin.math.sin
@@ -179,7 +179,7 @@ class MotionFlowTest : OffTheTopUiTest() {
     fun activityEffects_preserveCountdownAndFeedbackHold_butRecalibrateAfterPause() {
         useTouchControls() // Let GameApp actually stop hardware before supplying any samples.
         chooseDeck("Wild World")
-        tapText("Start round  →")
+        tapText("Start round")
         assertCountdown()
         val motion = onModel { model ->
             ModelMotion(model).also { stream ->
@@ -202,7 +202,7 @@ class MotionFlowTest : OffTheTopUiTest() {
                 assertReadyAt(model, 22f)
             }
         }
-        awaitText("✓ GOT IT!")
+        awaitFeedback("Correct")
         compose.onNodeWithTag("word").assertDoesNotExist()
         onModel { model ->
             assertReadyAt(model, 22f) // Feedback rendering must not reset the returned hold.
@@ -241,8 +241,19 @@ class MotionFlowTest : OffTheTopUiTest() {
             assertEquals(listOf(Answer(first, Outcome.CORRECT), Answer(second, Outcome.PASS)), model.round?.answers)
             assertEquals(1, model.round?.score)
         }
-        awaitText("↷ PASS")
+        awaitFeedback("Pass")
         assertLiveScore(1)
+    }
+
+    private fun awaitFeedback(label: String) {
+        // The feedback and its disabled scoring button now share the same plain label.
+        val feedback = hasText(label) and !hasClickAction()
+        compose.waitUntil(timeoutMillis = 10_000) {
+            compose.onAllNodes(feedback).fetchSemanticsNodes().size == 1
+        }
+        compose.onNode(feedback).assertIsDisplayed().assertTextEquals(label)
+        compose.onNodeWithTag("correct").assertIsNotEnabled()
+        compose.onNodeWithTag("pass").assertIsNotEnabled()
     }
 
     private fun withMotionModel(block: (AppModel) -> Unit) = withReloadedModel { model ->

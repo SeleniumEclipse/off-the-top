@@ -63,12 +63,12 @@ Tap-Text 'Day'
 Disable-Toggle 'Touch-only mode'
 Disable-Toggle 'Gentle tilts'
 Capture 'settings-day'
-Tap-Text '‹ Back'
+Tap-Text 'Back'
 Tap-Text '60s'
 Capture 'home'
 Tap-Text 'Wild World'
 & $Adb @device emu sensor set acceleration 9.81:0:0
-Require-Text 'Start round  →'
+Require-Text 'Start round'
 Require-Text 'Ready'
 & $Adb @device emu sensor set acceleration 0:0:-9.81
 Require-Description 'Correct tested'
@@ -80,7 +80,7 @@ Require-Description 'Pass tested'
 Require-Text 'Return to start'
 Capture 'tilt-practice'
 & $Adb @device emu sensor set acceleration 9.81:0:0
-Tap-Text 'Start round  →'
+Tap-Text 'Start round'
 Capture 'countdown'
 # UI snapshots provide real elapsed time and verification, not arbitrary sleep delays.
 $watch = [Diagnostics.Stopwatch]::StartNew()
@@ -108,20 +108,20 @@ Tap-Text 'Change deck'
 Tap-Text 'Settings'
 Tap-Text 'Night'
 Capture 'settings-night'
-Tap-Text '‹ Back'
+Tap-Text 'Back'
 Capture 'home-night'
 Tap-Text 'Settings'
 Tap-Text 'Day'
-Tap-Text '‹ Back'
+Tap-Text 'Back'
 & $Adb @device shell am force-stop $Package
 & $Adb @device shell am start -W -n "$Package/com.nicgames.offthetop.MainActivity"
 Tap-Text 'Recent rounds'
 Require-Text 'Wild World'
 Write-Output 'PASS: signed-release tilt gameplay, pause, review, themes, and history after process restart'
-Tap-Text '‹ Back'
+Tap-Text 'Back'
 Tap-Text '30s'
 Tap-Text 'Do Your Thing'
-Tap-Text 'Start round  →'
+Tap-Text 'Start round'
 $watch = [Diagnostics.Stopwatch]::StartNew()
 do {
     $ui = Read-Ui
@@ -147,7 +147,7 @@ foreach ($direction in @(1, -1)) {
     # Reuse these rounds for Night/Day coverage; no extra round or timed wait.
     Tap-Text 'Settings'
     Tap-Text $(if ($direction -eq 1) { 'Night' } else { 'Day' })
-    Tap-Text '‹ Back'
+    Tap-Text 'Back'
     Tap-Text '60s'
     Set-Tilt 22 $direction
     Tap-Text 'Everyday Things'
@@ -163,7 +163,7 @@ foreach ($direction in @(1, -1)) {
     Set-Tilt 22 $direction
     Require-Text 'Ready'
     Capture "natural-tilt-$direction"
-    Tap-Text 'Start round  →'
+    Tap-Text 'Start round'
     $watch = [Diagnostics.Stopwatch]::StartNew()
     do {
         $ui = Read-Ui

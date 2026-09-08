@@ -2,7 +2,7 @@
 
 An original, offline Android forehead-guessing party game. Three large decks, no ads, no accounts, no network access. Original content, not affiliated with Heads Up! or its publishers.
 
-**[Download the Android APK](https://github.com/SeleniumEclipse/off-the-top/releases/tag/v1.2.0)** · Android 8.0+
+**[Download the Android APK](https://github.com/SeleniumEclipse/off-the-top/releases/tag/v1.3.0)** · Android 8.0+
 
 ![Off the Top deck selection](screenshots/home.png)
 
@@ -34,13 +34,13 @@ Native Android only; no web backend, authentication, browser or database service
 
 ## Theme and fonts
 
-Print-inspired type and sharp borders with **one teal accent, navy ink and warm ivory paper**. No slogans or repeated promotional labels. Dark mode has a static layered navy-to-deep-teal background, muted edges and dark shadows. Clue cards remain solid for readability. Archivo Black and Barlow are bundled under their accompanying SIL Open Font License.
+Print-inspired type and sharp borders with **one teal accent, navy ink and warm ivory paper**. Flat solid backgrounds in both themes. No gradients, glows, emoji icons, decorative pictures or repeated subtitles. Controls use consistent Material Sharp vector icons and clear labels. Archivo Black and Barlow are bundled under their accompanying SIL Open Font License. See [the sourced design rules](DESIGN.md) for the research, decisions and checks that keep these habits from returning.
 
 ![Dark mode](screenshots/home-night.png)
 
 ## Validation
 
-130 unit tests and 22 Android tests passed, including clutter regressions and actual rendered background/contrast checks. The signed update was installed over the earlier app and tested with simulated hardware motion and a real-time countdown. Motion behavior is unchanged from 1.1.0. See [the validation report](VALIDATION.md) for coverage and physical-device limits.
+134 unit tests and 22 Android tests passed, including design guardrails, vector/accessibility checks and flat-background pixel/contrast checks. The signed update was installed over the earlier app and tested with simulated hardware motion and a real-time countdown. Motion behavior is unchanged from 1.1.0. See [the validation report](VALIDATION.md) for coverage and physical-device limits.
 
 ![In-round gameplay](screenshots/playing.png)
 

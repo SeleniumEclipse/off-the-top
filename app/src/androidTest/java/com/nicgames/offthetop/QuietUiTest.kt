@@ -2,7 +2,11 @@ package com.nicgames.offthetop
 
 import android.hardware.Sensor
 import android.hardware.SensorManager
+import androidx.compose.ui.graphics.vector.VectorPainter
+import androidx.compose.ui.platform.InspectableValue
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import org.junit.Assert.*
@@ -22,14 +26,15 @@ class QuietUiTest : OffTheTopUiTest() {
         assertNoCopy("THE FOREHEAD GUESSING GAME", "Good clues.", "One phone.", "ALL OFFLINE", "NO ADS")
 
         val decks = onModel { it.decks.toList() }
-        val descriptions = listOf("Nature", "Objects & food", "Actions & places")
-        assertEquals(descriptions.size, decks.size)
-        decks.forEachIndexed { index, deck ->
+        assertEquals(3, decks.size)
+        decks.forEach { deck ->
             compose.onNode(hasScrollToNodeAction()).performScrollToNode(hasText(deck.title))
             compose.onNodeWithContentDescription("Choose ${deck.title}, ${deck.words.size} cards")
                 .assertIsDisplayed().assertHasClickAction()
-                .assertTextEquals(deck.title, descriptions[index], "${deck.words.size} cards")
-            assertNoCopy(deck.subtitle, deck.examples)
+                .assertTextEquals(deck.title, "${deck.words.size} cards")
+                .assertContentDescriptionEquals("Choose ${deck.title}, ${deck.words.size} cards")
+            assertNoCopy(deck.subtitle, deck.examples, "Nature", "Objects & food", "Actions & places")
+            assertNoGlyphIconText()
         }
 
         tapText("How to play", scroll = true)
@@ -44,7 +49,8 @@ class QuietUiTest : OffTheTopUiTest() {
             .performScrollTo().assertIsDisplayed()
         compose.onNodeWithText("Leaving the app pauses the timer. Resume resets your tilt.").assertIsDisplayed()
         assertNoCopy("A little help up top", "GOOD TO KNOW")
-        tapText("‹ Back")
+        assertNoGlyphIconText()
+        tapText("Back")
         awaitText("Choose a deck")
         onModel { assertEquals(Screen.HOME, it.screen); assertTrue(it.history.isEmpty()) }
     }
@@ -61,9 +67,12 @@ class QuietUiTest : OffTheTopUiTest() {
         setToggle("Sound effects", false)
         setToggle("Vibration", false)
         assertToggle("Touch-only mode", false)
-        tapText("‹ Back")
+        assertNoCopy("Tap instead of tilting", "Smaller nods")
+        assertNoGlyphIconText()
+        tapText("Back")
         chooseDeck("Wild World")
 
+        assertPracticeInstruction()
         assertShortTiltFeedback()
         compose.onNodeWithTag("tilt-reading").assertDoesNotExist()
         compose.onNodeWithText("Reset tilt").assertDoesNotExist()
@@ -105,7 +114,12 @@ class QuietUiTest : OffTheTopUiTest() {
             assertTrue(model.practicedPass)
         }
         compose.onNodeWithContentDescription("Correct tested").performScrollTo().assertIsDisplayed()
+            .assertContentDescriptionEquals("Correct tested")
+        compose.onNodeWithText("Correct").assertIsDisplayed().assertTextEquals("Correct")
         compose.onNodeWithContentDescription("Pass tested").performScrollTo().assertIsDisplayed()
+            .assertContentDescriptionEquals("Pass tested")
+        compose.onNodeWithText("Pass").assertIsDisplayed().assertTextEquals("Pass")
+        assertNoGlyphIconText()
         assertShortTiltFeedback()
         assertNoCopy("GOT IT! Return to your starting angle.", "PASS! Return to your starting angle.")
         resetAndHold {
@@ -126,15 +140,24 @@ class QuietUiTest : OffTheTopUiTest() {
         compose.onNodeWithTag("tilt-reading").assertDoesNotExist()
         compose.onNodeWithText("Reset tilt").assertDoesNotExist()
         compose.onNodeWithText("Tilt setup").assertIsDisplayed()
-        tapText("‹ Back")
+        tapText("Back")
         awaitText("Choose a deck")
     }
 
     @Test
     fun touchRoundKeepsCountdownPlayPauseAndResultsQuiet_withoutLosingScore() {
         useTouchControls()
+        tapText("Settings", scroll = true)
+        for (label in listOf("Sound effects", "Vibration", "Touch-only mode", "Gentle tilts")) {
+            compose.onNodeWithText(label).performScrollTo().assertIsDisplayed()
+            compose.onNodeWithContentDescription(label).assertHasClickAction()
+        }
+        assertNoCopy("Tap instead of tilting", "Smaller nods")
+        assertNoGlyphIconText()
+        tapText("Back")
         chooseDeck("Wild World")
         val deckSize = onModel { it.selected.words.size }
+        assertPracticeInstruction()
         compose.onAllNodesWithText("Wild World").assertCountEquals(1)
         compose.onNodeWithTag("round-options").assertIsDisplayed().assertTextEquals("60s · $deckSize unseen")
         compose.onNodeWithTag("practice-feedback").performScrollTo().assertTextEquals("Touch controls")
@@ -143,15 +166,17 @@ class QuietUiTest : OffTheTopUiTest() {
         compose.onNodeWithText("Reset tilt").assertDoesNotExist()
         assertNoCopy("$deckSize cards", "Friends give the clues.", "Large touch buttons", "3-second countdown")
 
-        tapText("Start round  →")
+        tapText("Start round")
         assertCountdown()
         assertNoCopy("PHONE TO FOREHEAD", "Screen facing your friends.", "WILD WORLD")
         val first = awaitWord()
         assertLiveScore(0)
+        assertScoringButtons()
         compose.onNodeWithTag("live-tilt-status").assertTextEquals("")
         compose.onNodeWithTag("correct").performClick()
         val second = awaitWord(excluding = setOf(first))
         assertLiveScore(1)
+        assertScoringButtons()
         compose.onNodeWithTag("live-tilt-status").assertTextEquals("")
         assertNoCopy("FRIENDS TAP TO SCORE", "Return to your starting angle", "↓ GOT IT · ↑ PASS", "WILD WORLD")
 
@@ -171,9 +196,70 @@ class QuietUiTest : OffTheTopUiTest() {
         compose.onNodeWithText("0 passed · 1 unanswered").assertIsDisplayed()
         assertAnswer(0, first, Outcome.CORRECT)
         assertAnswer(1, second, Outcome.UNANSWERED)
-        assertNoCopy("ROUND COMPLETE", "NICE\nGUESSING.", "THE ROUND, RECAPTURED")
+        assertNoCopy("ROUND COMPLETE", "NICE\nGUESSING.", "THE ROUND, RECAPTURED", "Tap to correct")
+        assertNoGlyphIconText()
         assertSingleSavedRound("Wild World", 60,
             listOf(Answer(first, Outcome.CORRECT), Answer(second, Outcome.UNANSWERED)))
+
+        tapText("Change deck", scroll = true)
+        tapText("Recent rounds", scroll = true)
+        assertHistoryDisclosure("Expand answers").performClick()
+        assertHistoryAnswer(first, Outcome.CORRECT)
+        assertHistoryAnswer(second, Outcome.UNANSWERED)
+        compose.onAllNodes(hasContentDescription(", Correct", substring = true)).assertCountEquals(1)
+        compose.onAllNodes(hasContentDescription(", Passed", substring = true)).assertCountEquals(0)
+        compose.onAllNodes(hasContentDescription(", Unanswered", substring = true)).assertCountEquals(1)
+        assertNoGlyphIconText()
+        assertHistoryDisclosure("Collapse answers").performClick()
+        assertHistoryDisclosure("Expand answers")
+        compose.onNodeWithText(first).assertDoesNotExist()
+        compose.onNodeWithText(second).assertDoesNotExist()
+    }
+
+    private fun assertPracticeInstruction() {
+        compose.onNodeWithText("Hold at your forehead,\nfacing your friends.")
+            .performScrollTo().assertIsDisplayed()
+        assertNoCopy("Phone to forehead", "Hold still. Screen facing friends.")
+        assertNoGlyphIconText()
+    }
+
+    private fun assertScoringButtons() {
+        compose.onNodeWithTag("correct").assertIsDisplayed().assertIsEnabled()
+            .assertHasClickAction().assertTextEquals("Correct")
+        compose.onNodeWithTag("pass").assertIsDisplayed().assertIsEnabled()
+            .assertHasClickAction().assertTextEquals("Pass")
+        assertNoGlyphIconText()
+    }
+
+    private fun assertHistoryDisclosure(description: String): SemanticsNodeInteraction {
+        val row = compose.onNode(hasClickAction() and hasText("Wild World"))
+            .performScrollTo().assertIsDisplayed().assertContentDescriptionEquals(description)
+        val image = compose.onNode(hasContentDescription(description) and
+            SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Image), useUnmergedTree = true)
+            .assertIsDisplayed().assert(SemanticsMatcher.keyNotDefined(SemanticsProperties.Text))
+        // A description alone could hide a missing icon. Inspect the actual image's
+        // paint modifier: it must draw a vector, not text or a bitmap stand-in.
+        // The unit source guardrail separately verifies the official Sharp imports.
+        val layout = image.fetchSemanticsNode().layoutInfo
+        compose.runOnIdle {
+            assertTrue("History disclosure must paint a vector", layout.getModifierInfo().any { info ->
+                (info.modifier as? InspectableValue)?.inspectableElements?.any {
+                    it.name == "painter" && it.value is VectorPainter
+                } == true
+            })
+        }
+        assertNoGlyphIconText()
+        return row
+    }
+
+    private fun assertNoGlyphIconText() {
+        val glyphOrEmoji = Regex("[✓↷↑↓→←‹›]|[\\x{1F000}-\\x{1FAFF}\\x{2600}-\\x{27BF}\\x{FE0F}\\x{20E3}]")
+        val iconText = SemanticsMatcher("Text must not substitute a glyph or emoji for an icon") { node ->
+            node.config.contains(SemanticsProperties.Text) && node.config[SemanticsProperties.Text].any {
+                glyphOrEmoji.containsMatchIn(it.text) || it.text in listOf("+", "−", "—")
+            }
+        }
+        compose.onAllNodes(iconText, useUnmergedTree = true).assertCountEquals(0)
     }
 
     private fun assertShortTiltFeedback() {

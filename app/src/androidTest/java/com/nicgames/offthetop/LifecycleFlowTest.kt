@@ -184,7 +184,7 @@ class LifecycleFlowTest : OffTheTopUiTest() {
         tapText("Change deck", scroll = true)
         tapText("Recent rounds", scroll = true)
         compose.onNode(hasClickAction() and hasText("Do Your Thing") and hasText("0"))
-            .assertIsDisplayed().assertTextContains("+").performClick()
+            .assertIsDisplayed().assertContentDescriptionEquals("Expand answers").performClick()
         assertHistoryAnswer(word, Outcome.UNANSWERED)
         compose.onAllNodes(hasContentDescription(", Unanswered", substring = true)).assertCountEquals(1)
         compose.onNodeWithText("30s ·", substring = true).assertExists()

@@ -6,7 +6,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -16,12 +15,18 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.sharp.ArrowBack
+import androidx.compose.material.icons.automirrored.sharp.ArrowForward
+import androidx.compose.material.icons.sharp.Check
+import androidx.compose.material.icons.sharp.Close
+import androidx.compose.material.icons.sharp.KeyboardArrowDown
+import androidx.compose.material.icons.sharp.KeyboardArrowUp
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
@@ -116,7 +121,7 @@ class MainActivity : ComponentActivity() {
 
 @Composable private fun Header(title: String, onBack: () -> Unit) {
     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-        PressButton("‹ Back", onBack)
+        PressButton("Back", onBack, icon = Icons.AutoMirrored.Sharp.ArrowBack)
         Spacer(Modifier.width(16.dp))
         Text(title, fontFamily = Headline, fontSize = 24.sp, color = LocalPress.current.ink)
     }
@@ -128,7 +133,6 @@ class MainActivity : ComponentActivity() {
         Column(Modifier.weight(0.36f).fillMaxHeight().verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(16.dp)) {
             Spacer(Modifier.height(8.dp))
             Text("OFF\nTHE TOP", color = p.ink, fontFamily = Headline, fontSize = 48.sp, lineHeight = 48.sp)
-            Box(Modifier.width(72.dp).height(4.dp).background(p.accent))
             Spacer(Modifier.height(8.dp))
             PressButton("How to play", { model.screen = Screen.HELP }, Modifier.fillMaxWidth())
             PressButton("Settings", { model.screen = Screen.SETTINGS }, Modifier.fillMaxWidth())
@@ -138,17 +142,12 @@ class MainActivity : ComponentActivity() {
         Column(Modifier.weight(0.64f).fillMaxHeight()) {
             Text("Choose a deck", color = p.muted, fontSize = 16.sp, modifier = Modifier.padding(bottom = 14.dp).testTag("deck-heading"))
             LazyColumn(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(12.dp), contentPadding = PaddingValues(bottom = 6.dp)) {
-                itemsIndexed(model.decks) { index, deck ->
-                    val accent = p.accent
+                itemsIndexed(model.decks) { _, deck ->
                     Row(Modifier.fillMaxWidth().border(2.dp, p.edge).background(p.card).clickable(role = Role.Button) { model.choose(deck) }
-                        .semantics { contentDescription = "Choose ${deck.title}, ${deck.words.size} cards" }.padding(12.dp),
+                        .semantics { contentDescription = "Choose ${deck.title}, ${deck.words.size} cards" }
+                        .heightIn(min = 80.dp).padding(horizontal = 18.dp, vertical = 14.dp),
                         verticalAlignment = Alignment.CenterVertically) {
-                        DeckMark(index, accent, Modifier.size(48.dp).background(p.wash).padding(6.dp))
-                        Spacer(Modifier.width(14.dp))
-                        Column(Modifier.weight(1f)) {
-                            Text(deck.title, color = p.ink, fontFamily = Headline, fontSize = 23.sp)
-                            Text(listOf("Nature", "Objects & food", "Actions & places")[index], fontSize = 14.sp, color = p.muted)
-                        }
+                        Text(deck.title, color = p.ink, fontFamily = Headline, fontSize = 23.sp, modifier = Modifier.weight(1f).padding(end = 12.dp))
                         Text("${deck.words.size} cards", fontFamily = Body, color = p.muted, fontSize = 13.sp)
                     }
                 }
@@ -157,30 +156,6 @@ class MainActivity : ComponentActivity() {
                 Text("Time", color = p.muted, fontSize = 14.sp)
                 Spacer(Modifier.width(12.dp))
                 DurationPicker(model, Modifier.weight(1f))
-            }
-        }
-    }
-}
-
-@Composable private fun DeckMark(index: Int, color: Color, modifier: Modifier) {
-    Canvas(modifier) {
-        val w = size.width
-        when (index) {
-            0 -> {
-                drawOval(color, Offset(w * .1f, w * .15f), Size(w * .32f, w * .55f))
-                drawOval(color, Offset(w * .5f, w * .03f), Size(w * .32f, w * .55f))
-                drawLine(color, Offset(w * .47f, w * .32f), Offset(w * .47f, w * .98f), w * .07f)
-            }
-            1 -> {
-                drawRect(color, Offset(w * .08f, w * .25f), Size(w * .58f, w * .63f))
-                drawCircle(color, w * .21f, Offset(w * .73f, w * .42f), style = androidx.compose.ui.graphics.drawscope.Stroke(w * .09f))
-            }
-            else -> {
-                drawCircle(color, w * .13f, Offset(w * .58f, w * .12f))
-                drawLine(color, Offset(w * .52f, w * .3f), Offset(w * .38f, w * .59f), w * .1f)
-                drawLine(color, Offset(w * .49f, w * .36f), Offset(w * .8f, w * .5f), w * .08f)
-                drawLine(color, Offset(w * .4f, w * .55f), Offset(w * .68f, w * .88f), w * .1f)
-                drawLine(color, Offset(w * .4f, w * .55f), Offset(w * .16f, w * .87f), w * .1f)
             }
         }
     }
@@ -205,14 +180,11 @@ class MainActivity : ComponentActivity() {
         Header(model.selected.title, model::home)
         Row(Modifier.weight(1f), horizontalArrangement = Arrangement.spacedBy(24.dp)) {
             Column(Modifier.weight(1f).fillMaxHeight().verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.Center) {
-                PhoneMark(Modifier.size(110.dp))
-                Spacer(Modifier.height(14.dp))
-                Text("Phone to forehead", fontFamily = Headline, fontSize = 25.sp, color = p.ink)
-                Text("Hold still. Screen facing friends.", color = p.muted, modifier = Modifier.padding(top = 8.dp))
+                Text("Hold at your forehead,\nfacing your friends.", fontFamily = Headline, fontSize = 25.sp, lineHeight = 32.sp, color = p.ink)
             }
             Column(Modifier.weight(1f).fillMaxHeight().verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically)) {
-                Instruction("↓", "Correct", p.accent, model.practicedCorrect)
-                Instruction("↑", "Pass", p.ink, model.practicedPass)
+                Instruction(Icons.Sharp.KeyboardArrowDown, "Correct", p.accent, model.practicedCorrect)
+                Instruction(Icons.Sharp.KeyboardArrowUp, "Pass", p.ink, model.practicedPass)
                 Text(if (sensors && !model.touchOnly) shortTiltStatus(model) else "Touch controls",
                     Modifier.fillMaxWidth().testTag("practice-feedback"), fontWeight = FontWeight.SemiBold, fontSize = 15.sp, color = p.muted)
                 if (sensors && !model.touchOnly) {
@@ -226,20 +198,8 @@ class MainActivity : ComponentActivity() {
         }
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
             Text("${model.seconds}s · ${model.unseen(model.selected)} unseen", Modifier.weight(1f).testTag("round-options"), color = p.muted)
-            PressButton("Start round  →", model::start, Modifier.widthIn(min = 220.dp), primary = true)
+            PressButton("Start round", model::start, Modifier.widthIn(min = 220.dp), primary = true)
         }
-    }
-}
-
-@Composable private fun PhoneMark(modifier: Modifier) {
-    val p = LocalPress.current
-    Canvas(modifier) {
-        val w = size.width
-        drawCircle(p.wash, w * .48f)
-        drawRect(p.shadow, Offset(w * .14f, w * .34f), Size(w * .76f, w * .42f))
-        drawRect(p.card, Offset(w * .1f, w * .3f), Size(w * .76f, w * .42f))
-        drawRect(p.accent, Offset(w * .1f, w * .3f), Size(w * .76f, w * .42f), style = androidx.compose.ui.graphics.drawscope.Stroke(3.dp.toPx()))
-        drawLine(p.accent, Offset(w * .35f, w * .51f), Offset(w * .61f, w * .51f), 3.dp.toPx())
     }
 }
 
@@ -249,13 +209,13 @@ private fun shortTiltStatus(model: AppModel): String = when (model.tiltStatus) {
     else -> "Return to start"
 }
 
-@Composable private fun Instruction(arrow: String, label: String, color: Color, done: Boolean) {
+@Composable private fun Instruction(arrow: ImageVector, label: String, color: Color, done: Boolean) {
     Row(Modifier.fillMaxWidth().background(LocalPress.current.card).border(1.dp, LocalPress.current.edge)
         .semantics { contentDescription = "$label ${if (done) "tested" else "tilt"}" }.padding(horizontal = 16.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
-        Text(arrow, color = color, fontSize = 30.sp, fontWeight = FontWeight.Bold)
+        Icon(arrow, contentDescription = null, tint = color, modifier = Modifier.size(30.dp))
         Spacer(Modifier.width(14.dp))
         Text(label, color = LocalPress.current.ink, fontWeight = FontWeight.Bold, fontSize = 21.sp, modifier = Modifier.weight(1f))
-        if (done) Text("✓", color = color, fontSize = 22.sp)
+        if (done) Icon(Icons.Sharp.Check, contentDescription = null, tint = color, modifier = Modifier.size(24.dp))
     }
 }
 
@@ -286,10 +246,14 @@ private fun shortTiltStatus(model: AppModel): String = when (model.tiltStatus) {
             }
         }
         Phase.PLAYING -> {
+            val score = r.score
             Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                    Text("✓ ${r.score}", color = p.accent, fontWeight = FontWeight.Bold, fontSize = 24.sp,
-                        modifier = Modifier.weight(1f).testTag("live-score").semantics { contentDescription = "${r.score} correct" })
+                    Row(Modifier.weight(1f).testTag("live-score").semantics(mergeDescendants = true) { contentDescription = "$score correct" },
+                        verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Icon(Icons.Sharp.Check, contentDescription = null, tint = p.accent, modifier = Modifier.size(28.dp))
+                        Text("$score", color = p.accent, fontWeight = FontWeight.Bold, fontSize = 24.sp)
+                    }
                     PressButton("Pause", model::pause)
                     Text("${ceil(r.remainingMs / 1000.0).toInt()}s", Modifier.weight(1f).testTag("timer"), textAlign = TextAlign.End,
                         color = if (r.remainingMs <= 10_000) p.accent else p.ink, fontFamily = Headline, fontSize = 30.sp)
@@ -302,14 +266,16 @@ private fun shortTiltStatus(model: AppModel): String = when (model.tiltStatus) {
                 val cardColor = when (feedback) { Outcome.CORRECT -> p.accent; Outcome.PASS -> p.ink; else -> p.card }
                 val feedbackInk = if (feedback == Outcome.CORRECT) p.onAccent else p.paper
                 Box(Modifier.weight(1f).fillMaxWidth().border(2.dp, p.edge).background(cardColor).padding(horizontal = 24.dp, vertical = 10.dp), contentAlignment = Alignment.Center) {
-                    if (feedback != null) Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(if (feedback == Outcome.CORRECT) "✓ GOT IT!" else "↷ PASS", fontFamily = Headline, fontSize = 48.sp, color = feedbackInk)
+                    if (feedback != null) Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(18.dp)) {
+                        Icon(if (feedback == Outcome.CORRECT) Icons.Sharp.Check else Icons.AutoMirrored.Sharp.ArrowForward,
+                            contentDescription = null, tint = feedbackInk, modifier = Modifier.size(52.dp))
+                        Text(if (feedback == Outcome.CORRECT) "Correct" else "Pass", fontFamily = Headline, fontSize = 48.sp, color = feedbackInk)
                     } else AutoWord(r.currentWord.orEmpty(), model::revealWord)
                 }
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(18.dp), verticalAlignment = Alignment.CenterVertically) {
-                    PressButton("↑ PASS", { model.mark(Outcome.PASS) }, Modifier.weight(1f).testTag("pass"), enabled = feedback == null)
+                    PressButton("Pass", { model.mark(Outcome.PASS) }, Modifier.weight(1f).testTag("pass"), enabled = feedback == null, icon = Icons.Sharp.KeyboardArrowUp)
                     Text(if (model.touchOnly || model.tilt.armed) "" else shortTiltStatus(model), Modifier.weight(1f).testTag("live-tilt-status"), textAlign = TextAlign.Center, fontSize = 14.sp, color = p.muted)
-                    PressButton("↓ GOT IT", { model.mark(Outcome.CORRECT) }, Modifier.weight(1f).testTag("correct"), primary = true, enabled = feedback == null)
+                    PressButton("Correct", { model.mark(Outcome.CORRECT) }, Modifier.weight(1f).testTag("correct"), primary = true, enabled = feedback == null, icon = Icons.Sharp.KeyboardArrowDown)
                 }
             }
         }
@@ -353,7 +319,6 @@ private fun shortTiltStatus(model: AppModel): String = when (model.tiltStatus) {
         }
         Column(Modifier.weight(.62f).fillMaxHeight()) {
             Text("Answers", fontFamily = Headline, fontSize = 22.sp, color = p.ink, modifier = Modifier.padding(vertical = 6.dp))
-            Text("Tap to correct", color = p.muted, fontSize = 14.sp)
             Spacer(Modifier.height(10.dp))
             Rule()
             LazyColumn(Modifier.weight(1f)) {
@@ -367,13 +332,13 @@ private fun shortTiltStatus(model: AppModel): String = when (model.tiltStatus) {
 @Composable private fun AnswerRow(answer: Answer, modifier: Modifier = Modifier, onClick: (() -> Unit)? = null) {
     val p = LocalPress.current
     val color = when (answer.outcome) { Outcome.CORRECT -> p.accent; Outcome.PASS -> p.ink; else -> p.muted }
-    val label = when (answer.outcome) { Outcome.CORRECT -> "✓"; Outcome.PASS -> "↷"; else -> "—" }
+    val icon = when (answer.outcome) { Outcome.CORRECT -> Icons.Sharp.Check; Outcome.PASS -> Icons.AutoMirrored.Sharp.ArrowForward; else -> Icons.Sharp.Close }
     val description = when (answer.outcome) { Outcome.CORRECT -> "Correct"; Outcome.PASS -> "Passed"; else -> "Unanswered" }
     Column(modifier.semantics(mergeDescendants = true) { contentDescription = "${answer.word}, $description" }
-        .then(if (onClick != null) Modifier.clickable(role = Role.Button, onClick = onClick) else Modifier)) {
+        .then(if (onClick != null) Modifier.clickable(role = Role.Button, onClickLabel = "Change result", onClick = onClick) else Modifier)) {
         Row(Modifier.fillMaxWidth().heightIn(min = 52.dp).padding(vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
             Text(answer.word, Modifier.weight(1f).padding(end = 12.dp), color = p.ink, fontWeight = FontWeight.SemiBold, fontSize = 17.sp)
-            Text(label, color = color, fontWeight = FontWeight.Bold, fontSize = 22.sp)
+            Icon(icon, contentDescription = null, tint = color, modifier = Modifier.size(24.dp))
         }
         Rule()
     }
@@ -389,12 +354,13 @@ private fun shortTiltStatus(model: AppModel): String = when (model.tiltStatus) {
             Column(Modifier.weight(1f).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text("Round length", color = p.muted)
                 DurationPicker(model)
-                SettingToggle("Sound effects", null, model.sound, model::changeSound)
-                SettingToggle("Vibration", null, model.haptics, model::changeHaptics)
+                SettingToggle("Sound effects", model.sound, model::changeSound)
+                SettingToggle("Vibration", model.haptics, model::changeHaptics)
             }
             Column(Modifier.weight(1f).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                SettingToggle("Touch-only mode", if (sensors) "Tap instead of tilting" else "No motion sensor", model.touchOnly, model::setTouch)
-                SettingToggle("Gentle tilts", "Smaller nods", model.gentle, model::changeGentle)
+                SettingToggle("Touch-only mode", model.touchOnly, model::setTouch)
+                if (!sensors) Text("No motion sensor", color = p.muted)
+                SettingToggle("Gentle tilts", model.gentle, model::changeGentle)
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     listOf("System", "Day", "Night").forEach { label -> PressButton(label, { model.changeTheme(label) }, Modifier.weight(1f), primary = model.theme == label) }
                 }
@@ -406,12 +372,9 @@ private fun shortTiltStatus(model: AppModel): String = when (model.tiltStatus) {
         confirmButton = { TextButton(onClick = { model.resetSeen(); resetDialog = false }) { Text("Reshuffle") } }, dismissButton = { TextButton(onClick = { resetDialog = false }) { Text("Cancel") } })
 }
 
-@Composable private fun SettingToggle(title: String, detail: String?, checked: Boolean, onChange: (Boolean) -> Unit) {
+@Composable private fun SettingToggle(title: String, checked: Boolean, onChange: (Boolean) -> Unit) {
     Row(Modifier.fillMaxWidth().heightIn(min = 64.dp), verticalAlignment = Alignment.CenterVertically) {
-        Column(Modifier.weight(1f).padding(end = 8.dp)) {
-            Text(title, color = LocalPress.current.ink, fontWeight = FontWeight.Bold, fontSize = 17.sp)
-            detail?.let { Text(it, color = LocalPress.current.muted, fontSize = 13.sp) }
-        }
+        Text(title, modifier = Modifier.weight(1f).padding(end = 8.dp), color = LocalPress.current.ink, fontWeight = FontWeight.Bold, fontSize = 17.sp)
         Switch(checked, onChange, Modifier.semantics { contentDescription = title })
     }
 }
@@ -454,7 +417,8 @@ private fun shortTiltStatus(model: AppModel): String = when (model.tiltStatus) {
                             Text(record.deck, color = LocalPress.current.ink, fontWeight = FontWeight.Bold, fontSize = 19.sp)
                             Text("${record.seconds}s · ${DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(Date(record.id))}", color = LocalPress.current.muted, fontSize = 13.sp)
                         }
-                        Text(if (expanded == record.id) "−" else "+", fontSize = 24.sp, color = LocalPress.current.muted)
+                        Icon(if (expanded == record.id) Icons.Sharp.KeyboardArrowUp else Icons.Sharp.KeyboardArrowDown,
+                            contentDescription = if (expanded == record.id) "Collapse answers" else "Expand answers", tint = LocalPress.current.muted, modifier = Modifier.size(24.dp))
                     }
                     if (expanded == record.id) record.answers.forEach { AnswerRow(it) }
                 }

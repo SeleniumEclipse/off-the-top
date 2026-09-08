@@ -13,10 +13,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -31,13 +30,13 @@ val Body = FontFamily(Font(R.font.barlow_regular), Font(R.font.barlow_medium, Fo
 // One accent ink: teal. Navy, ivory and their shades do the rest.
 data class PressColors(val paper: Color, val card: Color, val ink: Color, val muted: Color,
     val accent: Color, val onAccent: Color, val wash: Color,
-    val edge: Color, val shadow: Color, val backgroundEnd: Color, val backgroundGlow: Color)
+    val edge: Color, val shadow: Color)
 val Day = PressColors(Color(0xFFF4EFE5), Color(0xFFFFFCF6), Color(0xFF192D38), Color(0xFF576974),
     Color(0xFF006C67), Color(0xFFFFFCF6), Color(0xFFD9EAE5),
-    Color(0xFF192D38), Color(0xFF192D38), Color(0xFFF4EFE5), Color.Transparent)
+    Color(0xFF192D38), Color(0xFF192D38))
 val Night = PressColors(Color(0xFF0B141B), Color(0xFF152730), Color(0xFFF4EFE5), Color(0xFFB1C2C5),
     Color(0xFF64CEC1), Color(0xFF0B141B), Color(0xFF203C43),
-    Color(0xFF48626A), Color(0xFF050C11), Color(0xFF142B32), Color(0xFF1C3D43))
+    Color(0xFF48626A), Color(0xFF050C11))
 val LocalPress = staticCompositionLocalOf { Day }
 
 @Composable fun PressTheme(mode: String, content: @Composable () -> Unit) {
@@ -59,30 +58,18 @@ val LocalPress = staticCompositionLocalOf { Day }
     }
 }
 
-/** Static, cached shading. No animation, random noise, or shading behind clue text. */
+/** Flat opaque surfaces in both themes. No gradients, glows, or decorative effects. */
 @Composable internal fun PageBackground(modifier: Modifier = Modifier, content: @Composable BoxScope.() -> Unit) {
+    Box(modifier.background(LocalPress.current.paper), content = content)
+}
+
+@Composable fun Rule(modifier: Modifier = Modifier) {
     val p = LocalPress.current
-    Box(modifier.drawWithCache {
-        val base = Brush.linearGradient(listOf(p.paper, p.backgroundEnd), Offset.Zero, Offset(size.width, size.height))
-        val glow = Brush.radialGradient(listOf(p.backgroundGlow.copy(alpha = if (p == Night) .65f else 0f), Color.Transparent),
-            center = Offset(size.width * .78f, size.height * .12f), radius = size.maxDimension * .7f)
-        onDrawBehind { drawRect(base); drawRect(glow) }
-    }, content = content)
+    Box(modifier.fillMaxWidth().height(1.dp).background(p.edge.copy(alpha = 0.5f)))
 }
 
-@Composable fun Rule(modifier: Modifier = Modifier, colored: Boolean = false) {
-    val p = LocalPress.current
-    if (colored) Column(modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(3.dp)) {
-        Box(Modifier.fillMaxWidth().height(4.dp).background(p.accent))
-        Box(Modifier.fillMaxWidth().height(1.dp).background(p.ink.copy(alpha = .25f)))
-    } else Box(modifier.fillMaxWidth().height(1.dp).background(p.edge.copy(alpha = 0.5f)))
-}
-
-@Composable fun Kicker(text: String, modifier: Modifier = Modifier, color: Color = LocalPress.current.muted) {
-    Text(text, modifier, color = color, fontFamily = Body, fontWeight = FontWeight.Bold, fontSize = 11.sp, letterSpacing = 1.8.sp)
-}
-
-@Composable fun PressButton(text: String, onClick: () -> Unit, modifier: Modifier = Modifier, primary: Boolean = false, enabled: Boolean = true) {
+@Composable fun PressButton(text: String, onClick: () -> Unit, modifier: Modifier = Modifier,
+    primary: Boolean = false, enabled: Boolean = true, icon: ImageVector? = null) {
     val p = LocalPress.current
     val interactions = remember { MutableInteractionSource() }
     val pressed by interactions.collectIsPressedAsState()
@@ -92,7 +79,10 @@ val LocalPress = staticCompositionLocalOf { Day }
         .background(if (enabled) bg else p.card, RoundedCornerShape(2.dp)).border(2.dp, p.edge, RoundedCornerShape(2.dp))
         .clickable(enabled = enabled, interactionSource = interactions, indication = null, role = Role.Button, onClick = onClick)
         .heightIn(min = 48.dp).padding(horizontal = 16.dp, vertical = 10.dp), contentAlignment = Alignment.Center) {
-        Text(text, color = if (!enabled) p.muted else if (primary) p.onAccent else p.ink,
-            fontFamily = Body, fontWeight = FontWeight.Bold, fontSize = 15.sp, textAlign = TextAlign.Center)
+        val foreground = if (!enabled) p.muted else if (primary) p.onAccent else p.ink
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            if (icon != null) Icon(icon, contentDescription = null, tint = foreground, modifier = Modifier.size(22.dp))
+            Text(text, color = foreground, fontFamily = Body, fontWeight = FontWeight.Bold, fontSize = 15.sp, textAlign = TextAlign.Center)
+        }
     }
 }

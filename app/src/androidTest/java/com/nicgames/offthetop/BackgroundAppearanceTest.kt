@@ -39,67 +39,69 @@ class BackgroundAppearanceTest {
     private val tolerance = .01f // Allows 8-bit capture rounding, not a different tint.
 
     @Test
-    fun dayBackdropIsUniformPaperWithoutAccentTint() {
-        renderBackdrop("Day")
-        val pixels = captureBackdrop()
-        samples.forEach { point ->
-            val actual = pixels.at(point)
-            assertColorNear("Day paper at $point", Day.paper, actual)
-            assertEquals("Day must be flat at $point", pixels[0, 0], actual)
-        }
+    fun dayBackdropIsUniformOpaqueStaticPaperWithReadableContrast() {
+        assertFlatStaticBackdrop("Day", Day)
     }
 
     @Test
-    fun nightBackdropHasVisibleStaticVariationAndReadableContrast() {
-        // Freeze frames before rendering so an accidental animation cannot run away
-        // during test synchronization. Advancing this clock never touches a game.
+    fun nightBackdropIsUniformOpaqueStaticPaperWithReadableContrast() {
+        assertFlatStaticBackdrop("Night", Night)
+    }
+
+    @Test
+    fun solidNightCardIsOpaqueAndDistinctFromSolidPage() {
+        renderBackdrop("Night", withCard = true)
+        val backdrop = captureBackdrop()
+        val card = compose.onNodeWithTag("solid-card").captureToImage().toPixelMap()
+        assertUniformSurface("Night card", card, Night.card)
+        samples.forEach { point ->
+            // All these samples are outside the centered card.
+            assertColorNear("Exposed Night paper at $point", Night.paper, backdrop.at(point))
+            assertEquals("Exposed page must be flat at $point", backdrop[0, 0], backdrop.at(point))
+        }
+        assertColorNear("Card covers the page center", Night.card, backdrop.at(.5f to .5f))
+        assertTrue("Card must be distinct from the exposed backdrop",
+            colorDistance(card.at(.5f to .5f), backdrop.at(0f to 0f)) > .01f)
+    }
+
+    private fun assertFlatStaticBackdrop(mode: String, palette: PressColors) {
+        // Freeze before rendering; a reintroduced animation must not prevent idling.
+        // This isolated frame clock never advances a round or changes game state.
         compose.mainClock.autoAdvance = false
-        renderBackdrop("Night")
+        renderBackdrop(mode)
         compose.mainClock.advanceTimeByFrame()
         val before = captureBackdrop()
-        assertTrue("Night corners must visibly differ",
-            colorDistance(before.at(0f to 0f), before.at(1f to 1f)) > .01f)
-        for (y in listOf(.1f, .9f)) {
-            assertTrue("Night must vary across the page at y=$y",
-                colorDistance(before.at(.1f to y), before.at(.9f to y)) > .01f)
-        }
-        // Bound the rendered colors by the intended palette, without reconstructing
-        // the gradient or its glow. This also catches a default purple/accent tint.
-        samples.forEach { point -> assertNightPalette(before.at(point), point) }
-        grid.forEach { point ->
-            val background = before.at(point)
-            listOf("ink" to Night.ink, "muted" to Night.muted, "accent" to Night.accent)
+        assertUniformSurface("$mode paper", before, palette.paper)
+        samples.forEach { point ->
+            listOf("ink" to palette.ink, "muted" to palette.muted, "accent" to palette.accent)
                 .forEach { (name, foreground) ->
-                    val contrast = contrastRatio(foreground, background)
-                    assertTrue("Night $name contrast at $point was $contrast, must exceed 4.5",
-                        contrast > 4.5f)
+                    val contrast = contrastRatio(foreground, before.at(point))
+                    assertTrue("$mode $name contrast at $point was $contrast, must be at least 4.5",
+                        contrast >= 4.5f)
                 }
         }
 
-        compose.mainClock.advanceTimeBy(1000)
-        val after = captureBackdrop()
-        assertEquals("Backdrop width must stay fixed", before.width, after.width)
-        assertEquals("Backdrop height must stay fixed", before.height, after.height)
-        for (y in 0 until before.height) for (x in 0 until before.width) {
-            if (before[x, y] != after[x, y]) {
-                assertEquals("Backdrop animated at ($x, $y) after one second", before[x, y], after[x, y])
+        // Check several frames, not only the end of a possible one-second cycle.
+        for (elapsed in listOf(250L, 750L, 1000L)) {
+            compose.mainClock.advanceTimeBy(elapsed)
+            val after = captureBackdrop()
+            assertEquals("Backdrop width must stay fixed", before.width, after.width)
+            assertEquals("Backdrop height must stay fixed", before.height, after.height)
+            for (y in 0 until before.height) for (x in 0 until before.width) {
+                if (before[x, y] != after[x, y]) {
+                    assertEquals("$mode backdrop animated at ($x, $y)", before[x, y], after[x, y])
+                }
             }
         }
     }
 
-    @Test
-    fun solidCardCoversNightGradientWithOpaqueCardSurface() {
-        renderBackdrop("Night", withCard = true)
-        val backdrop = captureBackdrop()
-        val card = compose.onNodeWithTag("solid-card").captureToImage().toPixelMap()
-        samples.forEach { point ->
-            assertColorNear("Solid card at $point", Night.card, card.at(point))
+    private fun assertUniformSurface(label: String, pixels: PixelMap, expected: Color) {
+        assertColorNear(label, expected, pixels[0, 0])
+        for (y in 0 until pixels.height) for (x in 0 until pixels.width) {
+            if (pixels[x, y] != pixels[0, 0]) {
+                assertEquals("$label must be uniform at ($x, $y)", pixels[0, 0], pixels[x, y])
+            }
         }
-        assertColorNear("Card covers the page center", Night.card, backdrop.at(.5f to .5f))
-        assertTrue("The exposed backdrop must still have a gradient",
-            colorDistance(backdrop.at(0f to 0f), backdrop.at(1f to 1f)) > .01f)
-        assertTrue("Card must be distinct from the exposed backdrop",
-            colorDistance(card.at(.5f to .5f), backdrop.at(0f to 0f)) > .01f)
     }
 
     private fun renderBackdrop(mode: String, withCard: Boolean = false) {
@@ -125,18 +127,6 @@ class BackgroundAppearanceTest {
     private fun assertColorNear(label: String, expected: Color, actual: Color) {
         assertTrue("$label: expected $expected, got $actual", colorDistance(expected, actual) <= tolerance)
         assertEquals("$label must be opaque", 1f, actual.alpha, tolerance)
-    }
-
-    private fun assertNightPalette(actual: Color, point: Pair<Float, Float>) {
-        val palette = listOf(Night.paper, Night.backgroundEnd, Night.backgroundGlow)
-        val channels = listOf<(Color) -> Float>({ it.red }, { it.green }, { it.blue })
-        channels.forEachIndexed { index, channel ->
-            val lower = palette.minOf { channel(it) } - tolerance
-            val upper = palette.maxOf { channel(it) } + tolerance
-            assertTrue("Unexpected Night tint at $point, channel $index: $actual",
-                channel(actual) in lower..upper)
-        }
-        assertEquals("Night paper must be opaque at $point", 1f, actual.alpha, tolerance)
     }
 
     private fun colorDistance(a: Color, b: Color): Float {
