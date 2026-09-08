@@ -2,7 +2,7 @@
 
 An original, offline Android forehead-guessing party game. Three large decks, no ads, no accounts, no network access. Original content, not affiliated with Heads Up! or its publishers.
 
-**[Download the Android APK](https://github.com/SeleniumEclipse/off-the-top/releases/tag/v1.0.0)** · Android 8.0+
+**[Download the Android APK](https://github.com/SeleniumEclipse/off-the-top/releases/tag/v1.1.0)** · Android 8.0+
 
 ![Off the Top deck selection](screenshots/home.png)
 
@@ -18,7 +18,7 @@ An original, offline Android forehead-guessing party game. Three large decks, no
 
 ## Play
 
-Choose a deck and round length. Hold the phone sideways at your forehead with the screen facing your friends. They describe or act out the card without saying its words. Tilt the **screen toward the floor** for correct; **toward the ceiling** to pass. Bring it upright between cards. Touch controls are also available. A short practice screen demonstrates both directions before a round.
+Choose a deck and round length. Hold the phone sideways at your forehead with the screen facing your friends. **Hold still during the countdown so it learns your starting angle.** Friends describe or act out the card without saying its words. Nod the **screen down** for correct; **up** to pass. Return to your starting angle between cards. Small nods work: 28° normally, or 20° with Gentle tilts. Touch controls are always available. Practice shows live readiness and angle, with a Reset tilt button. Pause and resume to relearn your hold during a round.
 
 Pause stops the clock. Leaving the app automatically pauses a running round. Review and correct your answers afterward. Unseen words are remembered separately for each deck, even across app restarts; when all have been used, the deck reshuffles.
 
@@ -34,11 +34,11 @@ Native Android only; no web backend, authentication, browser or database service
 
 ## Theme and fonts
 
-Matches the user's Set game: warm newsprint, Archivo Black and Barlow, solid ink borders, hard shadows, red/green/purple rules. Fonts are bundled under their accompanying SIL Open Font License.
+The same print-inspired style as the user's Set game, with its own restrained palette: **one teal accent, navy ink and warm ivory paper**. Archivo Black and Barlow, solid borders, hard shadows and double-line rules. Day and night themes use the same single accent. Correct/pass feedback uses contrasting teal/ink panels plus symbols, labels, sound and vibration; it never relies on color alone. Fonts are bundled under their accompanying SIL Open Font License.
 
 ## Validation
 
-95 unit tests and 12 Android tests passed. The actual signed release was installed and tested with simulated hardware motion and a real-time countdown. See [the validation report](VALIDATION.md) for commands, coverage and physical-device limits.
+130 unit tests and 16 Android tests passed. The signed update was installed over the earlier app and tested with simulated hardware motion (including a leaning forehead hold and ordinary nods in both landscape directions) and a real-time countdown. Tests now reproduce two cases the original detector failed. See [the validation report](VALIDATION.md) for commands, coverage and physical-device limits. Physical reliability on the affected phone still needs the user's playtest.
 
 ![In-round gameplay](screenshots/playing.png)
 

@@ -44,9 +44,12 @@ class AppModel(application: Application) : AndroidViewModel(application) {
     var gentle by mutableStateOf(prefs.getBoolean("gentle", false)); private set
     var round by mutableStateOf<RoundEngine?>(null); private set
     var revision by mutableIntStateOf(0); private set
-    var practiceFeedback by mutableStateOf("Hold the screen upright to get ready")
+    var practiceFeedback by mutableStateOf("Hold still at your forehead to get ready")
     var practicedCorrect by mutableStateOf(false)
     var practicedPass by mutableStateOf(false)
+    val tilt = TiltDetector()
+    var tiltStatus by mutableStateOf("HOLD AT YOUR FOREHEAD"); private set
+    var tiltReading by mutableStateOf("Learning your starting angle…"); private set
     var history by mutableStateOf(readHistory()); private set
     private var roundId = 0L
     private var previousSecond = -1
@@ -74,7 +77,7 @@ class AppModel(application: Application) : AndroidViewModel(application) {
 
     fun choose(deck: Deck) {
         selected = deck
-        practiceFeedback = "Hold the screen upright to get ready"
+        practiceFeedback = "Hold still at your forehead to get ready"
         practicedCorrect = false
         practicedPass = false
         screen = Screen.PRACTICE
@@ -128,8 +131,41 @@ class AppModel(application: Application) : AndroidViewModel(application) {
 
     fun practice(outcome: Outcome) {
         if (outcome == Outcome.CORRECT) practicedCorrect = true else practicedPass = true
-        practiceFeedback = if (outcome == Outcome.CORRECT) "GOT IT! Bring the screen upright again." else "PASS! Bring the screen upright again."
+        practiceFeedback = if (outcome == Outcome.CORRECT) "GOT IT! Return to your starting angle." else "PASS! Return to your starting angle."
         signal(outcome)
+    }
+
+    fun resetTilt() {
+        tilt.reset()
+        updateTiltStatus()
+    }
+
+    /** Always track the return during countdown/feedback, but only score a visible card. */
+    fun motionSample(x: Float, y: Float, z: Float, timestampMs: Long) {
+        if (touchOnly) return
+        val practice = screen == Screen.PRACTICE
+        val r = round
+        if (!practice && (screen != Screen.ROUND || r?.phase !in listOf(Phase.COUNTDOWN, Phase.PLAYING))) return
+        val event = tilt.sample(x, y, z, timestampMs,
+            calibrating = !practice && r?.phase == Phase.COUNTDOWN,
+            acceptTilt = practice || r?.phase == Phase.PLAYING && r.feedback == null && displayedWord != null && displayedWord == r.currentWord)
+        updateTiltStatus()
+        if (event != null) { if (practice) practice(event) else mark(event) }
+    }
+
+    private fun updateTiltStatus() {
+        tiltStatus = when {
+            !tilt.calibrated -> "HOLD AT YOUR FOREHEAD"
+            tilt.armed -> "READY TO TILT"
+            else -> "RETURN TO YOUR STARTING ANGLE"
+        }
+        val degrees = kotlin.math.abs(tilt.relativeDegrees).toInt()
+        tiltReading = when {
+            !tilt.calibrated -> "Learning your starting angle…"
+            degrees < 5 -> "At your starting angle"
+            tilt.relativeDegrees < 0 -> "Down $degrees°"
+            else -> "Up $degrees°"
+        }
     }
 
     private fun refresh() {
@@ -189,22 +225,18 @@ class AppModel(application: Application) : AndroidViewModel(application) {
     companion object { fun now(): Long = SystemClock.elapsedRealtime() }
 }
 
-/** Uses gravity when present; otherwise low-pass filters the accelerometer. */
-class MotionInput(context: Context, private val onSample: (Float, Float, Float) -> Unit) : SensorEventListener {
+/** Prefer responsive accelerometer samples over vendor-dependent gravity sensor lag. */
+class MotionInput(context: Context, private val onSample: (Float, Float, Float, Long) -> Unit) : SensorEventListener {
     private val manager = context.getSystemService(SensorManager::class.java)
-    private val sensor = manager.getDefaultSensor(Sensor.TYPE_GRAVITY) ?: manager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+    private val sensor = manager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) ?: manager.getDefaultSensor(Sensor.TYPE_GRAVITY)
     val available get() = sensor != null
-    private val gravity = FloatArray(3)
-    private var initialized = false
-    fun start() { initialized = false; sensor?.let { manager.registerListener(this, it, SensorManager.SENSOR_DELAY_GAME) } }
+    private val filter = MotionFilter()
+    fun start() { filter.reset(); sensor?.let { manager.registerListener(this, it, SensorManager.SENSOR_DELAY_GAME) } }
     fun stop() { manager.unregisterListener(this) }
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) = Unit
     override fun onSensorChanged(event: SensorEvent) {
-        if (sensor?.type == Sensor.TYPE_GRAVITY) onSample(event.values[0], event.values[1], event.values[2])
-        else {
-            for (i in 0..2) gravity[i] = if (initialized) gravity[i] * 0.75f + event.values[i] * 0.25f else event.values[i]
-            initialized = true
-            onSample(gravity[0], gravity[1], gravity[2])
-        }
+        val time = event.timestamp / 1_000_000L
+        val vector = if (sensor?.type == Sensor.TYPE_GRAVITY) event.values else filter.sample(event.values[0], event.values[1], event.values[2], time)
+        onSample(vector[0], vector[1], vector[2], time)
     }
 }

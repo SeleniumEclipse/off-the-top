@@ -42,11 +42,11 @@ Tap-Text 'Wild World'
 & $Adb emu sensor set acceleration 9.81:0:0
 Require-Text 'Start round  →'
 & $Adb emu sensor set acceleration 0:0:-9.81
-Require-Text 'GOT IT! Bring the screen upright again.'
+Require-Text 'GOT IT! Return to your starting angle.'
 & $Adb emu sensor set acceleration 9.81:0:0
-Require-Text 'GOT IT! Bring the screen upright again.'
+Require-Text 'GOT IT! Return to your starting angle.'
 & $Adb emu sensor set acceleration 0:0:9.81
-Require-Text 'PASS! Bring the screen upright again.'
+Require-Text 'PASS! Return to your starting angle.'
 Capture 'tilt-practice'
 & $Adb emu sensor set acceleration 9.81:0:0
 Tap-Text 'Start round  →'
@@ -100,3 +100,47 @@ if ($watch.Elapsed.TotalSeconds -lt 29) { throw 'Timer expired prematurely' }
 Require-Text '0 passed · 1 unanswered'
 Capture 'timer-expired'
 Write-Output "PASS: real 30-second timer expired without injected time after $([math]::Round($watch.Elapsed.TotalSeconds, 1)) seconds including countdown and UI verification"
+
+function Set-Tilt([double]$Degrees, [int]$Direction = 1) {
+    $rad = $Degrees * [Math]::PI / 180
+    $x = ($Direction * 9.81 * [Math]::Cos($rad)).ToString('F4', [Globalization.CultureInfo]::InvariantCulture)
+    $z = (9.81 * [Math]::Sin($rad)).ToString('F4', [Globalization.CultureInfo]::InvariantCulture)
+    & $Adb emu sensor set acceleration "${x}:0:${z}" | Out-Null
+}
+
+# Real sensor stack with a 22-degree resting hold, not just ideal full-flat flips.
+# Both landscape directions must support a small nod down AND back up.
+foreach ($direction in @(1, -1)) {
+    Tap-Text 'Change deck'
+    Tap-Text '60s'
+    Set-Tilt 22 $direction
+    Tap-Text 'Everyday Things'
+    Require-Text 'READY TO TILT'
+    foreach ($degrees in @(16, 10, 4, -2, -8, -12)) { Set-Tilt $degrees $direction }
+    Require-Text 'GOT IT! Return to your starting angle.'
+    Set-Tilt 22 $direction
+    Require-Text 'READY TO TILT'
+    foreach ($degrees in @(28, 34, 40, 46, 52, 56)) { Set-Tilt $degrees $direction }
+    Require-Text 'PASS! Return to your starting angle.'
+    Set-Tilt 22 $direction
+    Require-Text 'READY TO TILT'
+    Capture "natural-tilt-$direction"
+    Tap-Text 'Start round  →'
+    $watch = [Diagnostics.Stopwatch]::StartNew()
+    do {
+        $ui = Read-Ui
+        $playing = @($ui.SelectNodes('//node') | Where-Object { $_.text -eq '0 CORRECT' }).Count -gt 0
+        if ($watch.Elapsed.TotalSeconds -gt 15) { throw 'Natural-hold round did not start' }
+    } until ($playing)
+    foreach ($degrees in @(16, 10, 4, -2, -8, -12)) { Set-Tilt $degrees $direction }
+    Require-Text '1 CORRECT'
+    Set-Tilt 22 $direction
+    Require-Text '1 CORRECT'
+    foreach ($degrees in @(28, 34, 40, 46, 52, 56)) { Set-Tilt $degrees $direction }
+    Require-Text '1 CORRECT'
+    Set-Tilt 22 $direction
+    Tap-Text 'Pause'
+    Tap-Text 'End & review'
+    Require-Text '1 passed · 1 unanswered'
+    Write-Output "PASS: 22-degree forehead hold, modest down/up nods, landscape direction $direction"
+}

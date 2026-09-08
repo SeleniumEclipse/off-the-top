@@ -169,78 +169,135 @@ class RoundEngine(val words: List<String>, val durationSeconds: Int) {
 }
 
 /**
- * Gravity-vector tilt detection, independent of landscape direction. Negative device
- * Z means screen-to-floor (correct); positive Z means screen-to-ceiling (pass).
- * Invalid/shaken vectors break stability and require a fresh upright hold.
+ * Gravity-vector tilt relative to a stable forehead hold, in either landscape direction.
+ * Negative relative angles mean floor/correct; positive angles mean ceiling/pass.
+ * Supply sensor timestamps in monotonic milliseconds, including during hidden feedback.
+ * Countdown may retrack the hold; play never changes it without an explicit [reset].
  */
 class TiltDetector {
-    var threshold: Float = 0.68f
+    var activationDegrees: Float = 28f
         set(value) {
-            require(value.isFinite() && value > 0f && value < 1f) {
-                "Tilt threshold must be between zero and one."
+            require(value.isFinite() && value in 20f..45f) {
+                "Tilt activation must be between 20 and 45 degrees."
             }
             field = value
-            tiltSince = null
-            pendingOutcome = null
+            clearTilt()
         }
 
     val armed: Boolean
         get() = isArmed
 
+    val calibrated: Boolean
+        get() = baseline != null && !settlingCountdown
+
+    /** Last valid angle minus the baseline; zero until calibrated. Invalid samples keep it. */
+    val relativeDegrees: Float
+        get() = relativeAngle
+
+    val neutralDegrees: Float?
+        get() = baseline
+
     private var isArmed = false
-    private var uprightSince: Long? = null
+    private var baseline: Float? = null
+    private var settlingCountdown = false
+    private var relativeAngle = 0f
+    private var stableSince: Long? = null
+    private var stableMin = 0f
+    private var stableMax = 0f
+    private var stableMean = 0.0
+    private var stableCount = 0L
+    private var centerSince: Long? = null
     private var tiltSince: Long? = null
     private var pendingOutcome: Outcome? = null
     private var lastNow: Long? = null
 
+    /** Explicit recenter: forget the hold and all timing, but preserve sensitivity. */
     fun reset() {
-        isArmed = false
-        uprightSince = null
-        tiltSince = null
-        pendingOutcome = null
+        breakContinuity()
+        baseline = null
+        settlingCountdown = false
+        relativeAngle = 0f
         lastNow = null
     }
 
-    fun sample(x: Float, y: Float, z: Float, now: Long): Outcome? {
+    fun sample(
+        x: Float,
+        y: Float,
+        z: Float,
+        now: Long,
+        calibrating: Boolean = false,
+        acceptTilt: Boolean = true,
+    ): Outcome? {
         val previousNow = lastNow
         if (previousNow != null && now < previousNow) {
-            reset()
+            // Discard this reading, not the learned hold, when the clock goes backwards.
+            breakContinuity()
             lastNow = now
             return null
+        }
+        if (previousNow != null) {
+            val gap = now - previousNow
+            // A negative subtraction here is overflow across a very large forward gap.
+            if (gap < 0L || gap > MAX_SAMPLE_GAP_MS) breakContinuity()
         }
         lastNow = now
 
-        // Double intermediates also safely reject very large finite Float vectors.
-        val norm = sqrt(x.toDouble() * x + y.toDouble() * y + z.toDouble() * z)
+        // Double intermediates safely reject huge finite Floats as well as NaN/infinity.
+        val inPlaneSquared = x.toDouble() * x + y.toDouble() * y
+        val norm = sqrt(inPlaneSquared + z.toDouble() * z)
         if (!norm.isFinite() || norm < 5.0 || norm > 16.0) {
-            reset()
-            lastNow = now
+            breakContinuity()
+            if (calibrating) settlingCountdown = true
             return null
         }
-        val normalizedX = x / norm
-        val normalizedY = y / norm
-        val normalizedZ = z / norm
-        val upright = abs(normalizedZ) < 0.28 &&
-            maxOf(abs(normalizedX), abs(normalizedY)) > 0.65
+        val angle = Math.toDegrees(Math.atan2(z.toDouble(), sqrt(inPlaneSquared))).toFloat()
+        relativeAngle = baseline?.let { angle - it } ?: 0f
 
-        if (upright) {
-            tiltSince = null
-            pendingOutcome = null
-            val since = uprightSince ?: now.also { uprightSince = it }
-            if (now - since >= 250L) isArmed = true
+        // Even a repeated timestamp must not carry a hidden gesture into a visible card.
+        if (calibrating || !acceptTilt) {
+            clearTilt()
+            if (abs(relativeAngle) > CENTER_DEGREES) {
+                isArmed = false
+                centerSince = null
+            }
+        }
+        // Duplicates neither advance timers nor weight the calibration mean.
+        if (now == previousNow) return null
+
+        if (calibrating || !calibrated) {
+            // A late move to the forehead must finish settling even if countdown ends.
+            if (calibrating) settlingCountdown = true
+            learnHold(angle, now)
+            relativeAngle = baseline?.let { angle - it } ?: 0f
+        } else {
+            clearStability()
+        }
+        if (!calibrated) {
+            isArmed = false
             return null
         }
-        uprightSince = null
+
+        if (abs(relativeAngle) <= CENTER_DEGREES) {
+            clearTilt()
+            val since = centerSince ?: now.also { centerSince = it }
+            if (now - since >= CENTER_DWELL_MS) isArmed = true
+            return null
+        }
+        centerSince = null
+        if (calibrating || !acceptTilt) {
+            isArmed = false
+            clearTilt()
+            return null
+        }
         if (!armed) return null
 
         val outcome = when {
-            normalizedZ < -threshold -> Outcome.CORRECT
-            normalizedZ > threshold -> Outcome.PASS
+            relativeAngle <= -activationDegrees -> Outcome.CORRECT
+            relativeAngle >= activationDegrees -> Outcome.PASS
             else -> null
         }
         if (outcome == null) {
-            tiltSince = null
-            pendingOutcome = null
+            clearTilt()
             return null
         }
         if (pendingOutcome != outcome) {
@@ -248,11 +305,63 @@ class TiltDetector {
             tiltSince = now
             return null
         }
-        if (now - checkNotNull(tiltSince) < 120L) return null
+        if (now - checkNotNull(tiltSince) < TILT_DWELL_MS) return null
 
         isArmed = false
+        clearTilt()
+        return outcome
+    }
+
+    private fun learnHold(angle: Float, now: Long) {
+        if (abs(angle) > MAX_HOLD_DEGREES) {
+            clearStability()
+            return
+        }
+        if (stableSince == null ||
+            maxOf(stableMax, angle) - minOf(stableMin, angle) > STABLE_RANGE_DEGREES
+        ) {
+            stableSince = now
+            stableMin = angle
+            stableMax = angle
+            stableMean = angle.toDouble()
+            stableCount = 1L
+        } else {
+            stableMin = minOf(stableMin, angle)
+            stableMax = maxOf(stableMax, angle)
+            stableCount++
+            stableMean += (angle - stableMean) / stableCount
+        }
+        if (now - checkNotNull(stableSince) >= CALIBRATION_DWELL_MS) {
+            baseline = stableMean.toFloat()
+            settlingCountdown = false
+            isArmed = true
+        }
+    }
+
+    private fun clearStability() {
+        stableSince = null
+        stableCount = 0L
+    }
+
+    private fun clearTilt() {
         tiltSince = null
         pendingOutcome = null
-        return outcome
+    }
+
+    private fun breakContinuity() {
+        isArmed = false
+        centerSince = null
+        clearStability()
+        clearTilt()
+    }
+
+    private companion object {
+        private const val MAX_HOLD_DEGREES = 40f
+        private const val STABLE_RANGE_DEGREES = 6f
+        private const val CENTER_DEGREES = 14f
+        private const val CALIBRATION_DWELL_MS = 350L
+        private const val CENTER_DWELL_MS = 90L
+        private const val TILT_DWELL_MS = 50L
+        private const val MAX_SAMPLE_GAP_MS = 250L
     }
 }

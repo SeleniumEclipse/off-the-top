@@ -63,39 +63,31 @@ class MainActivity : ComponentActivity() {
 @Composable fun GameApp(model: AppModel) {
     val context = LocalContext.current
     val owner = LocalLifecycleOwner.current
-    val detector = remember { TiltDetector() }
     var resumed by remember { mutableStateOf(owner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) }
-    val motion = remember {
-        MotionInput(context) { x, y, z ->
-            if (!model.touchOnly && (model.screen == Screen.PRACTICE || model.screen == Screen.ROUND && model.round?.phase == Phase.PLAYING && model.round?.feedback == null)) {
-                val event = detector.sample(x, y, z, AppModel.now())
-                if (event != null) {
-                    if (model.screen == Screen.PRACTICE) model.practice(event) else model.mark(event)
-                }
-            }
-        }
-    }
+    val motion = remember(model) { MotionInput(context, model::motionSample) }
     val phase = model.round.also { model.revision }?.phase
-    val feedback = model.round?.feedback
-    LaunchedEffect(model.gentle, model.screen, phase, model.touchOnly, feedback) {
-        detector.threshold = if (model.gentle) 0.52f else 0.68f
-        detector.reset()
+    // No reset on feedback or countdown -> playing: that used to lose natural returns.
+    val tracking = model.screen == Screen.PRACTICE || model.screen == Screen.ROUND && phase in listOf(Phase.COUNTDOWN, Phase.PLAYING)
+    DisposableEffect(model.gentle, model.screen, tracking, model.touchOnly) {
+        model.tilt.activationDegrees = if (model.gentle) 20f else 28f
+        model.resetTilt()
+        onDispose { }
     }
     DisposableEffect(owner) {
         val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_RESUME) { resumed = true; detector.reset() }
+            if (event == Lifecycle.Event.ON_RESUME) { resumed = true; model.resetTilt() }
             if (event == Lifecycle.Event.ON_PAUSE) {
                 resumed = false
                 if (model.screen == Screen.ROUND) model.pause()
                 model.silence()
-                detector.reset()
+                model.resetTilt()
             }
         }
         owner.lifecycle.addObserver(observer)
         onDispose { owner.lifecycle.removeObserver(observer); motion.stop() }
     }
-    DisposableEffect(resumed, model.screen, phase, model.touchOnly) {
-        if (resumed && !model.touchOnly && (model.screen == Screen.PRACTICE || model.screen == Screen.ROUND && phase == Phase.PLAYING)) motion.start()
+    DisposableEffect(resumed, tracking, model.touchOnly) {
+        if (resumed && !model.touchOnly && tracking) motion.start()
         else motion.stop()
         onDispose { motion.stop() }
     }
@@ -155,11 +147,11 @@ class MainActivity : ComponentActivity() {
             }
             LazyColumn(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(10.dp), contentPadding = PaddingValues(bottom = 6.dp)) {
                 itemsIndexed(model.decks) { index, deck ->
-                    val accent = listOf(p.green, p.red, p.purple)[index]
+                    val accent = p.accent
                     Row(Modifier.fillMaxWidth().border(2.dp, p.ink).background(p.card).clickable { model.choose(deck) }
                         .semantics { contentDescription = "Choose ${deck.title}, ${deck.words.size} cards" }.padding(12.dp),
                         verticalAlignment = Alignment.CenterVertically) {
-                        DeckMark(index, accent, Modifier.size(42.dp))
+                        DeckMark(index, accent, Modifier.size(48.dp).background(p.wash).padding(6.dp))
                         Spacer(Modifier.width(14.dp))
                         Column(Modifier.weight(1f)) {
                             Text(deck.title, color = p.ink, fontFamily = Headline, fontSize = 23.sp)
@@ -210,9 +202,9 @@ class MainActivity : ComponentActivity() {
     val p = LocalPress.current
     Row(modifier.border(1.dp, p.ink)) {
         listOf(30, 60, 90, 120).forEach { value ->
-            Box(Modifier.weight(1f).background(if (model.seconds == value) p.ink else p.card).clickable { model.changeSeconds(value) }
+            Box(Modifier.weight(1f).background(if (model.seconds == value) p.accent else p.card).clickable { model.changeSeconds(value) }
                 .heightIn(min = 48.dp).padding(8.dp), contentAlignment = Alignment.Center) {
-                Text("${value}s", fontWeight = FontWeight.Bold, color = if (model.seconds == value) p.paper else p.ink)
+                Text("${value}s", fontWeight = FontWeight.Bold, color = if (model.seconds == value) p.onAccent else p.ink)
             }
         }
     }
@@ -231,11 +223,18 @@ class MainActivity : ComponentActivity() {
                 Kicker("${model.unseen(model.selected)} UNSEEN · ${model.seconds} SECOND ROUND")
             }
             Column(Modifier.weight(1f).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Instruction("↓", "SCREEN TO FLOOR", "Got it!", p.green, model.practicedCorrect)
-                Instruction("↑", "SCREEN TO CEILING", "Pass", p.red, model.practicedPass)
+                Instruction("↓", "SCREEN TO FLOOR", "Got it!", p.accent, model.practicedCorrect)
+                Instruction("↑", "SCREEN TO CEILING", "Pass", p.ink, model.practicedPass)
                 Text(if (sensors && !model.touchOnly) model.practiceFeedback else "Large touch buttons stay available during every round.",
                     Modifier.fillMaxWidth().background(p.card).padding(10.dp).testTag("practice-feedback"), fontWeight = FontWeight.SemiBold, fontSize = 14.sp, color = p.ink)
-                Text("Return upright between tilts. Keep movements gentle.", fontSize = 13.sp, color = p.muted)
+                if (sensors && !model.touchOnly) {
+                    Kicker(model.tiltStatus, Modifier.testTag("tilt-status"), color = p.ink)
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(model.tiltReading, Modifier.weight(1f).testTag("tilt-reading"), fontSize = 14.sp, color = p.muted)
+                        PressButton("Reset tilt", model::resetTilt)
+                    }
+                }
+                Text("Return to your starting angle between tilts. Small nods work.", fontSize = 13.sp, color = p.muted)
             }
         }
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -277,8 +276,8 @@ class MainActivity : ComponentActivity() {
                 }
                 Column(Modifier.weight(1f), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
                     Text("PHONE TO FOREHEAD", fontFamily = Headline, fontSize = 29.sp, color = p.ink)
-                    Text("${r.countdown}", fontFamily = Headline, fontSize = 92.sp, lineHeight = 100.sp, color = p.purple, modifier = Modifier.testTag("countdown"))
-                    Text("Screen facing your friends. Hold it upright.", color = p.muted)
+                    Text("${r.countdown}", fontFamily = Headline, fontSize = 92.sp, lineHeight = 100.sp, color = p.accent, modifier = Modifier.testTag("countdown"))
+                    Text("Screen facing your friends. Hold still to set your starting angle.", color = p.muted)
                 }
                 Rule(colored = true)
             }
@@ -286,26 +285,27 @@ class MainActivity : ComponentActivity() {
         Phase.PLAYING -> {
             Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                    Column(Modifier.weight(1f)) { Kicker(model.selected.title.uppercase()); Text("${r.score} CORRECT", color = p.green, fontWeight = FontWeight.Bold, modifier = Modifier.testTag("live-score")) }
+                    Column(Modifier.weight(1f)) { Kicker(model.selected.title.uppercase()); Text("${r.score} CORRECT", color = p.accent, fontWeight = FontWeight.Bold, modifier = Modifier.testTag("live-score")) }
                     PressButton("Pause", model::pause)
                     Text("${ceil(r.remainingMs / 1000.0).toInt()}s", Modifier.weight(1f).testTag("timer"), textAlign = TextAlign.End,
-                        color = if (r.remainingMs <= 10_000) p.red else p.ink, fontFamily = Headline, fontSize = 30.sp)
+                        color = if (r.remainingMs <= 10_000) p.accent else p.ink, fontFamily = Headline, fontSize = 30.sp)
                 }
                 val progress = r.remainingMs.toFloat() / (r.durationSeconds * 1000f)
                 Box(Modifier.fillMaxWidth().height(4.dp).background(p.ink.copy(alpha = .12f))) {
-                    Box(Modifier.fillMaxWidth(progress.coerceIn(0f, 1f)).fillMaxHeight().background(if (r.remainingMs <= 10_000) p.red else p.purple))
+                    Box(Modifier.fillMaxWidth(progress.coerceIn(0f, 1f)).fillMaxHeight().background(p.accent))
                 }
                 val feedback = r.feedback
-                val cardColor = when (feedback) { Outcome.CORRECT -> Day.green; Outcome.PASS -> Day.red; else -> p.card }
+                val cardColor = when (feedback) { Outcome.CORRECT -> p.accent; Outcome.PASS -> p.ink; else -> p.card }
+                val feedbackInk = if (feedback == Outcome.CORRECT) p.onAccent else p.paper
                 Box(Modifier.weight(1f).fillMaxWidth().border(2.dp, p.ink).background(cardColor).padding(horizontal = 24.dp, vertical = 10.dp), contentAlignment = Alignment.Center) {
                     if (feedback != null) Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(if (feedback == Outcome.CORRECT) "✓ GOT IT!" else "↷ PASS", fontFamily = Headline, fontSize = 48.sp, color = Color.White)
-                        Text("Bring the screen upright", color = Color.White, fontWeight = FontWeight.Bold)
+                        Text(if (feedback == Outcome.CORRECT) "✓ GOT IT!" else "↷ PASS", fontFamily = Headline, fontSize = 48.sp, color = feedbackInk)
+                        Text("Return to your starting angle", color = feedbackInk, fontWeight = FontWeight.Bold)
                     } else AutoWord(r.currentWord.orEmpty(), model::revealWord)
                 }
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(18.dp), verticalAlignment = Alignment.CenterVertically) {
                     PressButton("↑ PASS", { model.mark(Outcome.PASS) }, Modifier.weight(1f).testTag("pass"), enabled = feedback == null)
-                    Text(if (model.touchOnly) "FRIENDS TAP TO SCORE" else "↓ FLOOR = GOT IT\n↑ CEILING = PASS", Modifier.weight(1f), textAlign = TextAlign.Center, fontSize = 12.sp, color = p.muted, fontWeight = FontWeight.Bold)
+                    Text(if (model.touchOnly) "FRIENDS TAP TO SCORE" else "${model.tiltStatus}\n↓ GOT IT · ↑ PASS", Modifier.weight(1f).testTag("live-tilt-status"), textAlign = TextAlign.Center, fontSize = 11.sp, color = p.muted, fontWeight = FontWeight.Bold)
                     PressButton("↓ GOT IT", { model.mark(Outcome.CORRECT) }, Modifier.weight(1f).testTag("correct"), primary = true, enabled = feedback == null)
                 }
             }
@@ -341,7 +341,7 @@ class MainActivity : ComponentActivity() {
             Kicker("ROUND COMPLETE")
             Text("NICE\nGUESSING.", fontFamily = Headline, fontSize = 31.sp, lineHeight = 33.sp, color = p.ink)
             Row(verticalAlignment = Alignment.Bottom) {
-                Text("$score", fontFamily = Headline, fontSize = 76.sp, lineHeight = 80.sp, color = p.green, modifier = Modifier.testTag("final-score"))
+                Text("$score", fontFamily = Headline, fontSize = 76.sp, lineHeight = 80.sp, color = p.accent, modifier = Modifier.testTag("final-score"))
                 Text(" correct", color = p.muted, modifier = Modifier.padding(bottom = 10.dp))
             }
             Text("${answers.count { it.outcome == Outcome.PASS }} passed · ${answers.count { it.outcome == Outcome.UNANSWERED }} unanswered", color = p.muted)
@@ -365,7 +365,7 @@ class MainActivity : ComponentActivity() {
 
 @Composable private fun AnswerRow(answer: Answer, modifier: Modifier = Modifier, onClick: (() -> Unit)? = null) {
     val p = LocalPress.current
-    val color = when (answer.outcome) { Outcome.CORRECT -> p.green; Outcome.PASS -> p.red; else -> p.muted }
+    val color = when (answer.outcome) { Outcome.CORRECT -> p.accent; Outcome.PASS -> p.ink; else -> p.muted }
     val label = when (answer.outcome) { Outcome.CORRECT -> "✓ CORRECT"; Outcome.PASS -> "↷ PASSED"; else -> "— NO ANSWER" }
     Column(modifier.then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)) {
         Row(Modifier.fillMaxWidth().heightIn(min = 52.dp).padding(vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -393,7 +393,7 @@ class MainActivity : ComponentActivity() {
             Column(Modifier.weight(1f).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Kicker("CONTROLS & PAPER")
                 SettingToggle("Touch-only mode", if (sensors) "Turn off motion; friends tap the buttons." else "No motion sensor found. Use the touch buttons.", model.touchOnly, model::setTouch)
-                SettingToggle("Gentle tilts", "Less movement needed to register a tilt.", model.gentle, model::changeGentle)
+                SettingToggle("Gentle tilts", "Smaller nods: 20° instead of 28°.", model.gentle, model::changeGentle)
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     listOf("System", "Day", "Night").forEach { label -> PressButton(label, { model.changeTheme(label) }, Modifier.weight(1f), primary = model.theme == label) }
                 }
@@ -427,7 +427,7 @@ class MainActivity : ComponentActivity() {
                 HelpItem("03 / SAY IT OUT LOUD", "Guess the card. For Do Your Thing, try acting without speaking for a charades round. Use any house rules your group agrees on.")
             }
             Column(Modifier.weight(1f).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                HelpItem("04 / TILT TO SCORE", "Screen toward the floor = correct. Screen toward the ceiling = pass. Return upright before the next tilt. You can always use the touch buttons instead.")
+                HelpItem("04 / TILT TO SCORE", "Hold still at your forehead during the countdown to set your starting angle. Nod the screen down = correct; up = pass. Return to your starting angle between cards. Pause and resume to reset it, or use the touch buttons.")
                 HelpItem("05 / PASS THE PHONE", "Each correct answer is one point; no penalty for passing. Review the round and tap any mistaken result to fix it. Play again and hand the phone to the next person.")
                 HelpItem("GOOD TO KNOW", "Leaving the app pauses the timer. Resume gives you time to get ready. Last 20 rounds are saved on this phone. No internet, ads, camera, microphone or accounts. Original game and decks; not affiliated with Heads Up!.")
             }
@@ -436,7 +436,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable private fun HelpItem(title: String, text: String) {
-    Kicker(title, color = LocalPress.current.purple)
+    Kicker(title, color = LocalPress.current.accent)
     Text(text, color = LocalPress.current.ink, fontSize = 16.sp)
 }
 
@@ -450,7 +450,7 @@ class MainActivity : ComponentActivity() {
             itemsIndexed(model.history) { _, record ->
                 Column(Modifier.fillMaxWidth().border(1.dp, LocalPress.current.ink).background(LocalPress.current.card).padding(12.dp)) {
                     Row(Modifier.fillMaxWidth().clickable { expanded = if (expanded == record.id) null else record.id }.heightIn(min = 48.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Text("${record.score}", fontFamily = Headline, fontSize = 32.sp, color = LocalPress.current.green)
+                        Text("${record.score}", fontFamily = Headline, fontSize = 32.sp, color = LocalPress.current.accent)
                         Column(Modifier.weight(1f).padding(horizontal = 16.dp)) {
                             Text(record.deck, color = LocalPress.current.ink, fontWeight = FontWeight.Bold, fontSize = 19.sp)
                             Text("${record.seconds}s · ${DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(Date(record.id))}", color = LocalPress.current.muted, fontSize = 13.sp)

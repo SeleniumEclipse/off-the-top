@@ -147,7 +147,7 @@ class SettingsFlowTest : OffTheTopUiTest() {
         // colors as well as model/prefs, rather than asserting that every label exists.
         for (value in listOf(30, 60, 90, 120)) {
             compose.onNodeWithText("${value}s").performScrollTo().assertIsDisplayed()
-            assertTextColor("${value}s", if (value == seconds) Day.paper else Day.ink)
+            assertTextColor("${value}s", if (value == seconds) Day.onAccent else Day.ink)
         }
     }
 
