@@ -23,7 +23,7 @@ class SettingsFlowTest : OffTheTopUiTest() {
         setToggle("Gentle tilts", true)
         assertToggleSettings(sound = false, vibration = false, touch = true, gentle = true)
         compose.activityRule.scenario.recreate()
-        awaitText("Make it yours")
+        awaitText("Settings")
         assertToggleSettings(sound = false, vibration = false, touch = true, gentle = true)
 
         setToggle("Sound effects", true)
@@ -33,7 +33,7 @@ class SettingsFlowTest : OffTheTopUiTest() {
         tapText("‹ Back")
         tapText("Settings", scroll = true)
         compose.activityRule.scenario.recreate()
-        awaitText("Make it yours")
+        awaitText("Settings")
         assertToggleSettings(sound = true, vibration = true, touch = false, gentle = false)
         onModel { assertTrue(it.history.isEmpty()) }
     }
@@ -48,7 +48,7 @@ class SettingsFlowTest : OffTheTopUiTest() {
             tapText("${seconds}s", scroll = true)
             assertDuration(seconds)
             compose.activityRule.scenario.recreate()
-            awaitText("Make it yours")
+            awaitText("Settings")
             assertDuration(seconds)
             assertPaperTheme("Day", Day.ink)
         }
@@ -65,7 +65,7 @@ class SettingsFlowTest : OffTheTopUiTest() {
             }
             assertPaperTheme(theme, expectedInk)
             compose.activityRule.scenario.recreate()
-            awaitText("Make it yours")
+            awaitText("Settings")
             assertPaperTheme(theme, expectedInk)
             onModel { assertEquals(120, it.seconds) }
         }
@@ -74,10 +74,10 @@ class SettingsFlowTest : OffTheTopUiTest() {
         tapText("30s")
         chooseDeck("Everyday Things")
         val deckSize = onModel { it.selected.words.size }
-        compose.onNodeWithText("$deckSize UNSEEN · 30 SECOND ROUND").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithTag("round-options").assertIsDisplayed().assertTextEquals("30s · $deckSize unseen")
         compose.activityRule.scenario.recreate()
         awaitText("Start round  →")
-        compose.onNodeWithText("$deckSize UNSEEN · 30 SECOND ROUND").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithTag("round-options").assertIsDisplayed().assertTextEquals("30s · $deckSize unseen")
         withReloadedModel { assertEquals(30, it.seconds) }
         onModel { assertTrue(it.history.isEmpty()) }
     }
@@ -85,22 +85,19 @@ class SettingsFlowTest : OffTheTopUiTest() {
     @Test
     fun helpAndEmptyHistoryRemainUsableAfterRecreation() {
         tapText("How to play", scroll = true)
-        awaitText("A little help up top")
-        compose.onNodeWithText("01 / GATHER ROUND").performScrollTo().assertIsDisplayed()
-        compose.onNodeWithText("02 / NO PEEKING").performScrollTo().assertIsDisplayed()
-        compose.onNodeWithText("03 / SAY IT OUT LOUD").performScrollTo().assertIsDisplayed()
-        compose.onNodeWithText("04 / TILT TO SCORE").performScrollTo().assertIsDisplayed()
-        compose.onNodeWithText("05 / PASS THE PHONE").performScrollTo().assertIsDisplayed()
-        compose.onNodeWithText("GOOD TO KNOW").performScrollTo().assertIsDisplayed()
-        compose.onNodeWithText("Leaving the app pauses the timer.", substring = true)
-            .performScrollTo().assertIsDisplayed()
+        awaitText("How to play")
+        for (heading in listOf("Hold", "Guess", "Tilt", "Score")) {
+            compose.onNodeWithText(heading).performScrollTo().assertIsDisplayed()
+        }
+        compose.onNodeWithText("Leaving the app pauses the timer. Resume resets your tilt.").assertIsDisplayed()
         compose.activityRule.scenario.recreate()
-        awaitText("A little help up top")
+        awaitText("How to play")
         tapText("‹ Back")
-        tapText("Recent rounds  →", scroll = true)
+        tapText("Recent rounds", scroll = true)
         awaitText("Recent rounds")
         compose.onNodeWithText(EMPTY_HISTORY).assertIsDisplayed()
-        compose.onNodeWithText("REVIEW +").assertDoesNotExist()
+        compose.onNodeWithText("+").assertDoesNotExist()
+        compose.onNodeWithText("−").assertDoesNotExist()
         compose.activityRule.scenario.recreate()
         awaitText("Recent rounds")
         compose.onNodeWithText(EMPTY_HISTORY).assertIsDisplayed()
@@ -155,7 +152,7 @@ class SettingsFlowTest : OffTheTopUiTest() {
         onModel { assertEquals(theme, it.theme) }
         assertEquals(theme, preferences().getString("theme", null))
         withReloadedModel { assertEquals(theme, it.theme) }
-        assertTextColor("Make it yours", expectedInk)
+        assertTextColor("Settings", expectedInk)
     }
 
     private fun assertTextColor(text: String, expected: Color) {

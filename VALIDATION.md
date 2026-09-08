@@ -1,6 +1,14 @@
-# Release validation — Off the Top 1.1.0
+# Release validation — Off the Top 1.2.0
 
-## User-reported regression and new validation
+## Current change: less copy and a layered dark background
+
+- Removed redundant marketing text and repeated headers from home, practice, countdown, gameplay, pause and results. Shortened settings/help. Tilt diagnostics moved behind a Tilt setup control.
+- Kept the existing one-accent teal palette. Dark mode now uses cached static linear/radial shading, dark shadows and muted outlines; the readable clue surface remains opaque.
+- No changes to AppModel, RoundEngine, TiltDetector, MotionFilter or deck files. Existing gameplay, history, settings and motion assertions remain; UI assertions now use the shorter visible labels and accessible answer descriptions.
+- Added QuietUiTest (3 flows): clean home/help, optional diagnostics/reset, and compact touch gameplay through review/persistence.
+- Added BackgroundAppearanceTest (3 rendered-image tests): day stays uniform, night visibly varies without animating and preserves >4.5 text contrast at sampled points, and solid card surfaces cover the gradient. These sample actual Android-rendered pixels, not an imitation of the gradient math.
+
+## Previous motion regression (fixed in 1.1.0, retained)
 
 The user reported intermittent pass gestures and no successful downward correct gestures on their phone. **The earlier emulator PASS was not proof of physical reliability.** The two new PhysicalTiltRegressionTest cases were run against v1.0.0 first: both failed (exit 1). A 22° resting hold failed its narrow ±16° arming band, and a 32° downward nod did not meet the old ~43° threshold. The exact user's sensor readings are unavailable, so these are reproduced defects consistent with the report, not a claimed handset-specific diagnosis.
 
@@ -21,7 +29,9 @@ The single teal accent replaces all three former accents. Navy/ivory neutrals, g
 | Check | Result | Exit code | Evidence |
 |---|---|---:|---|
 | Pure engine, motion, theme and data tests | 130 passed, 0 failed | 0 | 50 round, 61 detector, 9 filter, 2 physical-regression, 3 contrast, 5 deck tests |
-| Android UI and model tests | 16 passed, 0 failed | 0 | GameplayFlowTest, SettingsFlowTest, LifecycleFlowTest, CardLayoutTest, MotionFlowTest |
+| Android UI, model and rendered-background tests | 22 passed, 0 failed, 0 skipped | 0 | Existing five test classes plus QuietUiTest and BackgroundAppearanceTest |
+| Copy and accessible outcomes | PASS | 0 | No repeated slogans or expanded diagnostics by default; icon-only answers keep accessible outcome descriptions and correction behavior |
+| Layered background | PASS | 0 | Actual pixel captures verify visible night variation, no one-second animation, opaque card surfaces and sampled text contrast |
 | Long-card layout cases | 108 fitting renders, plus overflow/recovery checks | 0 | 36 longest entries × 3 viewport/font-size combinations; actual AutoWord renderer |
 | Release lint | 0 errors; 10 advisory warnings | 0 | Version update notices, intentional landscape orientation, retained license resource |
 | Signed release build | PASS | 0 | R8 minification and resource shrinking enabled |
@@ -50,7 +60,7 @@ Use the Gradle test commands in the README. The PowerShell script in tools/relea
 
 Unit tests cover precise deadline boundaries, timer overflow, cooldown, pause/resume and deck exhaustion. Instrumented lifecycle expiry tests advance the pure engine clock deterministically; the separate release smoke script also checks a real 30-second expiry with no injected time.
 
-MotionFilterTest runs complete filtered down/up traces at 5, 10, 20 and 50 ms sample intervals. Detector tests use continuous streams instead of pretending two readings a long time apart prove stability. MotionFlowTest exercises actual AppModel input gates and one real-activity calibration lifecycle; its isolated model streams are **not** hardware tests. The release smoke script separately exercises Android's real sensor listener with emulator-injected acceleration. The updated instructions and accent-button text colors required two UI assertions to change; functionality assertions were retained.
+MotionFilterTest runs complete filtered down/up traces at 5, 10, 20 and 50 ms sample intervals. Detector tests use continuous streams instead of pretending two readings a long time apart prove stability. MotionFlowTest exercises actual AppModel input gates and one real-activity calibration lifecycle; its isolated model streams are **not** hardware tests. The release smoke script separately exercises Android's real sensor listener with emulator-injected acceleration and checks the simplified UI through visible text and accessibility descriptions. It now pins commands to the emulator so connected physical phones are untouched.
 
 ## Limits
 

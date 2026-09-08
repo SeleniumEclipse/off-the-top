@@ -62,13 +62,13 @@ class LifecycleFlowTest : OffTheTopUiTest() {
             .config[SemanticsProperties.Text].single().text.removeSuffix("s").toInt()
         val frozenSeconds = ceil(frozenTime / 1000.0).toInt()
         assertTrue("Resume countdown must not spend three seconds of round time", timerSeconds in (frozenSeconds - 1)..frozenSeconds)
-        compose.onNodeWithTag("live-score").assertTextEquals("0 CORRECT")
+        assertLiveScore(0)
         compose.waitUntil(timeoutMillis = 5_000) {
             onModel { checkNotNull(it.round).remainingMs <= frozenTime - 1_000 }
         }
         assertEquals(setOf(word), seenWords("everyday"))
         finishThroughPause()
-        assertAnswer(0, word, "— NO ANSWER")
+        assertAnswer(0, word, Outcome.UNANSWERED)
         assertSingleSavedRound("Everyday Things", 30, listOf(Answer(word, Outcome.UNANSWERED)))
     }
 
@@ -80,7 +80,7 @@ class LifecycleFlowTest : OffTheTopUiTest() {
         val first = startAndAwaitWord(60)
         compose.onNodeWithTag("correct").performClick()
         val second = awaitWord(excluding = setOf(first))
-        compose.onNodeWithTag("live-score").assertTextEquals("1 CORRECT")
+        assertLiveScore(1)
         tapText("Pause")
         assertPaused()
         val retainedModel = onModel { it }
@@ -118,18 +118,18 @@ class LifecycleFlowTest : OffTheTopUiTest() {
             tapText("Resume round")
             assertCountdown()
             assertEquals(second, awaitWord())
-            compose.onNodeWithTag("live-score").assertTextEquals("1 CORRECT")
+            assertLiveScore(1)
 
             finishThroughPause()
             compose.onNodeWithTag("final-score").assertTextEquals("1")
-            assertAnswer(0, first, "✓ CORRECT")
-            assertAnswer(1, second, "— NO ANSWER")
+            assertAnswer(0, first, Outcome.CORRECT)
+            assertAnswer(1, second, Outcome.UNANSWERED)
             assertSingleSavedRound("Wild World", 60, listOf(Answer(first, Outcome.CORRECT), Answer(second, Outcome.UNANSWERED)))
             tapText("Play again", scroll = true)
             val replayWord = startAndAwaitWord(60)
             assertFalse(replayWord in setOf(first, second))
             assertEquals(setOf(first, second, replayWord), seenWords("wild-world"))
-            compose.onNodeWithTag("live-score").assertTextEquals("0 CORRECT")
+            assertLiveScore(0)
             onModel { model ->
                 assertTrue(checkNotNull(model.round).words.none { it == first || it == second })
                 assertEquals(1, model.history.size)
@@ -145,7 +145,7 @@ class LifecycleFlowTest : OffTheTopUiTest() {
         tapText("30s")
         chooseDeck("Do Your Thing")
         val word = startAndAwaitWord(30)
-        compose.onNodeWithTag("live-score").assertTextEquals("0 CORRECT")
+        assertLiveScore(0)
         val revisionBeforeExpiry = onModel { it.revision }
         onModel { model ->
             val engine = checkNotNull(model.round)
@@ -163,13 +163,14 @@ class LifecycleFlowTest : OffTheTopUiTest() {
             assertTrue(model.revision > revisionBeforeExpiry)
         }
         awaitTag("final-score")
+        compose.onNodeWithTag("results-heading").assertIsDisplayed().assertTextEquals("Results")
         compose.onNodeWithTag("final-score").assertTextEquals("0")
         compose.onNodeWithText("0 passed · 1 unanswered").assertIsDisplayed()
         compose.onNodeWithTag("word").assertDoesNotExist()
         compose.onNodeWithTag("timer").assertDoesNotExist()
         compose.onNodeWithTag("correct").assertDoesNotExist()
         compose.onNodeWithTag("pass").assertDoesNotExist()
-        assertAnswer(0, word, "— NO ANSWER")
+        assertAnswer(0, word, Outcome.UNANSWERED)
         val answers = listOf(Answer(word, Outcome.UNANSWERED))
         assertSingleSavedRound("Do Your Thing", 30, answers)
         val recordId = onModel { it.history.single().id }
@@ -181,11 +182,11 @@ class LifecycleFlowTest : OffTheTopUiTest() {
         onModel { assertEquals(recordId, it.history.single().id) }
 
         tapText("Change deck", scroll = true)
-        tapText("Recent rounds  →", scroll = true)
+        tapText("Recent rounds", scroll = true)
         compose.onNode(hasClickAction() and hasText("Do Your Thing") and hasText("0"))
-            .assertIsDisplayed().performClick()
-        compose.onNodeWithText(word).performScrollTo().assertIsDisplayed()
-        compose.onNodeWithText("— NO ANSWER").assertIsDisplayed()
+            .assertIsDisplayed().assertTextContains("+").performClick()
+        assertHistoryAnswer(word, Outcome.UNANSWERED)
+        compose.onAllNodes(hasContentDescription(", Unanswered", substring = true)).assertCountEquals(1)
         compose.onNodeWithText("30s ·", substring = true).assertExists()
         assertEquals(setOf(word), seenWords("do-your-thing"))
     }

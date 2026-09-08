@@ -1,6 +1,5 @@
 package com.nicgames.offthetop
 
-import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlin.math.cos
@@ -243,7 +242,7 @@ class MotionFlowTest : OffTheTopUiTest() {
             assertEquals(1, model.round?.score)
         }
         awaitText("↷ PASS")
-        compose.onNodeWithTag("live-score").assertTextEquals("1 CORRECT")
+        assertLiveScore(1)
     }
 
     private fun withMotionModel(block: (AppModel) -> Unit) = withReloadedModel { model ->

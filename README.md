@@ -2,7 +2,7 @@
 
 An original, offline Android forehead-guessing party game. Three large decks, no ads, no accounts, no network access. Original content, not affiliated with Heads Up! or its publishers.
 
-**[Download the Android APK](https://github.com/SeleniumEclipse/off-the-top/releases/tag/v1.1.0)** · Android 8.0+
+**[Download the Android APK](https://github.com/SeleniumEclipse/off-the-top/releases/tag/v1.2.0)** · Android 8.0+
 
 ![Off the Top deck selection](screenshots/home.png)
 
@@ -18,7 +18,7 @@ An original, offline Android forehead-guessing party game. Three large decks, no
 
 ## Play
 
-Choose a deck and round length. Hold the phone sideways at your forehead with the screen facing your friends. **Hold still during the countdown so it learns your starting angle.** Friends describe or act out the card without saying its words. Nod the **screen down** for correct; **up** to pass. Return to your starting angle between cards. Small nods work: 28° normally, or 20° with Gentle tilts. Touch controls are always available. Practice shows live readiness and angle, with a Reset tilt button. Pause and resume to relearn your hold during a round.
+Choose a deck and round length. Hold the phone sideways at your forehead with the screen facing your friends. **Hold still during the countdown so it learns your starting angle.** Friends describe or act out the card without saying its words. Nod the **screen down** for correct; **up** to pass. Return to your starting angle between cards. Small nods work: 28° normally, or 20° with Gentle tilts. Touch controls are always available. Practice shows a short readiness cue; open **Tilt setup** for the live angle and Reset tilt button. Pause and resume to relearn your hold during a round.
 
 Pause stops the clock. Leaving the app automatically pauses a running round. Review and correct your answers afterward. Unseen words are remembered separately for each deck, even across app restarts; when all have been used, the deck reshuffles.
 
@@ -34,11 +34,13 @@ Native Android only; no web backend, authentication, browser or database service
 
 ## Theme and fonts
 
-The same print-inspired style as the user's Set game, with its own restrained palette: **one teal accent, navy ink and warm ivory paper**. Archivo Black and Barlow, solid borders, hard shadows and double-line rules. Day and night themes use the same single accent. Correct/pass feedback uses contrasting teal/ink panels plus symbols, labels, sound and vibration; it never relies on color alone. Fonts are bundled under their accompanying SIL Open Font License.
+Print-inspired type and sharp borders with **one teal accent, navy ink and warm ivory paper**. No slogans or repeated promotional labels. Dark mode has a static layered navy-to-deep-teal background, muted edges and dark shadows. Clue cards remain solid for readability. Archivo Black and Barlow are bundled under their accompanying SIL Open Font License.
+
+![Dark mode](screenshots/home-night.png)
 
 ## Validation
 
-130 unit tests and 16 Android tests passed. The signed update was installed over the earlier app and tested with simulated hardware motion (including a leaning forehead hold and ordinary nods in both landscape directions) and a real-time countdown. Tests now reproduce two cases the original detector failed. See [the validation report](VALIDATION.md) for commands, coverage and physical-device limits. Physical reliability on the affected phone still needs the user's playtest.
+130 unit tests and 22 Android tests passed, including clutter regressions and actual rendered background/contrast checks. The signed update was installed over the earlier app and tested with simulated hardware motion and a real-time countdown. Motion behavior is unchanged from 1.1.0. See [the validation report](VALIDATION.md) for coverage and physical-device limits.
 
 ![In-round gameplay](screenshots/playing.png)
 
