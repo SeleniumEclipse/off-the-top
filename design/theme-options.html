@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Off the Top — Theme options</title>
+  <link rel="stylesheet" href="theme-options.css">
+  <script src="theme-options.js" defer></script>
+</head>
+<body>
+  <header class="page-head">
+    <div><p class="project-label">OFF THE TOP / DESIGN STUDY</p><h1>Three theme options</h1></div>
+    <p class="scope-note">Visual prototypes only. <br>Your Android app is unchanged.</p>
+  </header>
+
+  <nav class="preview-tools" aria-label="Preview controls">
+    <div class="theme-picker" role="group" aria-label="Choose a concept">
+      <button type="button" data-filter="all" aria-pressed="true">Compare all</button>
+      <button type="button" data-filter="table" aria-pressed="false">Card Table</button>
+      <button type="button" data-filter="scoreboard" aria-pressed="false">Scoreboard</button>
+      <button type="button" data-filter="tickets" aria-pressed="false">Box Office</button>
+    </div>
+    <div class="screen-picker" role="group" aria-label="Choose a screen">
+      <button type="button" data-screen="decks" aria-pressed="true">Deck selection</button>
+      <button type="button" data-screen="round" aria-pressed="false">In a round</button>
+    </div>
+  </nav>
+
+  <main>
+    <article class="concept" id="table" data-concept="table">
+      <header class="concept-heading">
+        <div><h2>Card Table</h2><p>Cards on a dark felt table. <a href="card-table.html">Open the green/red refinement</a></p></div>
+        <span class="recommendation">Closest to Set</span>
+      </header>
+      <div class="viewport" aria-label="Card Table landscape phone preview">
+        <section class="screen table-theme" data-theme="table" aria-label="Card Table">
+          <div class="deck-screen table-home">
+            <header class="table-header">
+              <div class="table-wordmark">OFF THE TOP<span class="wordmark-rule" aria-hidden="true"></span></div>
+              <div class="utility-actions"><button data-action="help">How to play</button><button data-action="settings">Settings</button></div>
+            </header>
+            <div class="table-packs" aria-label="Decks">
+              <button class="pack pack-wild" data-deck="Wild World" aria-label="Play Wild World">
+                <span class="pack-top"><span>622 cards</span><svg class="icon" aria-hidden="true"><use href="#arrow-right"/></svg></span>
+                <span class="pack-title">WILD<br>WORLD</span>
+                <span class="pack-art wild-art" aria-hidden="true"><span></span><span></span><span></span></span>
+              </button>
+              <button class="pack pack-everyday" data-deck="Everyday Things" aria-label="Play Everyday Things">
+                <span class="pack-top"><span>617 cards</span><svg class="icon" aria-hidden="true"><use href="#arrow-right"/></svg></span>
+                <span class="pack-title">EVERYDAY<br>THINGS</span>
+                <span class="pack-art everyday-art" aria-hidden="true"><span></span><span></span><span></span></span>
+              </button>
+              <button class="pack pack-actions" data-deck="Do Your Thing" aria-label="Play Do Your Thing">
+                <span class="pack-top"><span>605 cards</span><svg class="icon" aria-hidden="true"><use href="#arrow-right"/></svg></span>
+                <span class="pack-title">DO YOUR<br>THING</span>
+                <span class="pack-art actions-art" aria-hidden="true"><span></span><span></span><span></span></span>
+              </button>
+            </div>
+            <footer class="table-footer">
+              <button class="text-control" data-action="history">Recent rounds</button>
+              <div class="duration" role="group" aria-label="Round length">
+                <button data-duration="30" aria-pressed="false">30s</button><button data-duration="60" aria-pressed="true">60s</button><button data-duration="90" aria-pressed="false">90s</button><button data-duration="120" aria-pressed="false">120s</button>
+              </div>
+            </footer>
+          </div>
+          <div class="round-screen table-round" hidden>
+            <div class="table-rail"><button class="quiet-button" data-action="back"><svg class="icon" aria-hidden="true"><use href="#arrow-left"/></svg>Decks</button><span class="rail-deck">Wild World</span><button class="quiet-button" data-action="pause">Pause</button></div>
+            <div class="table-word-card"><span class="card-index" aria-hidden="true">07</span><div class="word">GIRAFFE</div><div class="card-stats"><span><svg class="icon" aria-hidden="true"><use href="#check"/></svg><b class="score">4</b></span><span class="time">42s</span></div></div>
+            <div class="round-actions"><button class="physical muted-button" data-action="pass"><svg class="icon" aria-hidden="true"><use href="#arrow-up"/></svg>Pass</button><button class="physical primary-button" data-action="correct"><svg class="icon" aria-hidden="true"><use href="#arrow-down"/></svg>Correct</button></div>
+          </div>
+          <div class="overlay" hidden></div>
+        </section>
+      </div>
+      <footer class="concept-notes"><p><strong>Keep:</strong> Set’s card edges and solid print. <strong>Trade-off:</strong> the cream play card is brighter in a dark room.</p><a href="https://oinkgames.com/en/games/analog/deep-sea-adventure/" target="_blank" rel="noopener noreferrer">Reference: Oink game packaging</a></footer>
+    </article>
+
+    <article class="concept" id="scoreboard" data-concept="scoreboard">
+      <header class="concept-heading">
+        <div><h2>Scoreboard</h2><p>A small game-show control board. Warm black, not blue-black.</p></div>
+        <span class="recommendation">Recommended for dark mode</span>
+      </header>
+      <div class="viewport" aria-label="Scoreboard landscape phone preview">
+        <section class="screen scoreboard-theme" data-theme="scoreboard" aria-label="Scoreboard">
+          <div class="deck-screen scoreboard-home">
+            <aside class="scoreboard-mast"><div class="board-wordmark">OFF<br>THE<br>TOP<span class="mast-square" aria-hidden="true"></span></div><button class="mast-link" data-action="help">How to play</button><button class="mast-link" data-action="settings">Settings</button></aside>
+            <div class="board-menu">
+              <header class="board-menu-head"><span>CHOOSE A DECK</span><span>CARDS</span></header>
+              <div class="board-choices">
+                <button data-deck="Wild World" aria-label="Play Wild World"><span>WILD WORLD</span><span class="digit-set small-digits" aria-label="622"><i>6</i><i>2</i><i>2</i></span></button>
+                <button data-deck="Everyday Things" aria-label="Play Everyday Things"><span>EVERYDAY THINGS</span><span class="digit-set small-digits" aria-label="617"><i>6</i><i>1</i><i>7</i></span></button>
+                <button data-deck="Do Your Thing" aria-label="Play Do Your Thing"><span>DO YOUR THING</span><span class="digit-set small-digits" aria-label="605"><i>6</i><i>0</i><i>5</i></span></button>
+              </div>
+              <footer class="board-menu-footer"><button class="text-control" data-action="history">Recent rounds</button><div class="duration" role="group" aria-label="Round length"><button data-duration="30" aria-pressed="false">30s</button><button data-duration="60" aria-pressed="true">60s</button><button data-duration="90" aria-pressed="false">90s</button><button data-duration="120" aria-pressed="false">120s</button></div></footer>
+            </div>
+          </div>
+          <div class="round-screen scoreboard-round" hidden>
+            <aside class="score-tower"><span class="meter-label">TIME</span><span class="digit-set big-digits timer-digits" aria-label="42 seconds"><i>4</i><i>2</i></span><span class="meter-label">CORRECT</span><span class="digit-set big-digits score-digits" aria-label="4 correct"><i>0</i><i>4</i></span><button class="physical" data-action="pause">Pause</button></aside>
+            <div class="board-round-main"><header><button class="quiet-button" data-action="back"><svg class="icon" aria-hidden="true"><use href="#arrow-left"/></svg>Decks</button><span class="rail-deck">Wild World</span></header><div class="board-word-window"><span class="window-corner" aria-hidden="true"></span><div class="word">GIRAFFE</div></div><div class="round-actions"><button class="physical muted-button" data-action="pass"><svg class="icon" aria-hidden="true"><use href="#arrow-up"/></svg>Pass</button><button class="physical primary-button" data-action="correct"><svg class="icon" aria-hidden="true"><use href="#arrow-down"/></svg>Correct</button></div></div>
+          </div>
+          <div class="overlay" hidden></div>
+        </section>
+      </div>
+      <footer class="concept-notes"><p><strong>Keep:</strong> Set’s heavy type and press-down controls. <strong>Trade-off:</strong> more competitive, less like a card game.</p><a href="https://www.vestaboard.com/product" target="_blank" rel="noopener noreferrer">Reference: physical split-flap displays</a></footer>
+    </article>
+
+    <article class="concept" id="tickets" data-concept="tickets">
+      <header class="concept-heading">
+        <div><h2>Box Office</h2><p>Theater posters and ticket stubs. A party game with a show-night identity.</p></div>
+        <span class="recommendation">Most expressive</span>
+      </header>
+      <div class="viewport" aria-label="Box Office landscape phone preview">
+        <section class="screen tickets-theme" data-theme="tickets" aria-label="Box Office">
+          <div class="deck-screen tickets-home">
+            <header class="tickets-header"><span class="tickets-wordmark"><span>OFF</span><span>THE TOP</span></span><div class="utility-actions"><button data-action="help">How to play</button><button data-action="settings">Settings</button></div></header>
+            <div class="ticket-rack">
+              <button class="ticket" data-deck="Wild World" aria-label="Play Wild World"><span class="ticket-body"><span class="ticket-topline" aria-hidden="true"></span><strong>WILD<br>WORLD</strong></span><span class="ticket-stub"><span>622</span><small>CARDS</small><svg class="icon" aria-hidden="true"><use href="#arrow-right"/></svg></span></button>
+              <button class="ticket" data-deck="Everyday Things" aria-label="Play Everyday Things"><span class="ticket-body"><span class="ticket-topline" aria-hidden="true"></span><strong>EVERYDAY<br>THINGS</strong></span><span class="ticket-stub"><span>617</span><small>CARDS</small><svg class="icon" aria-hidden="true"><use href="#arrow-right"/></svg></span></button>
+              <button class="ticket" data-deck="Do Your Thing" aria-label="Play Do Your Thing"><span class="ticket-body"><span class="ticket-topline" aria-hidden="true"></span><strong>DO YOUR<br>THING</strong></span><span class="ticket-stub"><span>605</span><small>CARDS</small><svg class="icon" aria-hidden="true"><use href="#arrow-right"/></svg></span></button>
+            </div>
+            <footer class="tickets-footer"><button class="text-control" data-action="history">Recent rounds</button><div class="duration" role="group" aria-label="Round length"><button data-duration="30" aria-pressed="false">30s</button><button data-duration="60" aria-pressed="true">60s</button><button data-duration="90" aria-pressed="false">90s</button><button data-duration="120" aria-pressed="false">120s</button></div></footer>
+          </div>
+          <div class="round-screen tickets-round" hidden>
+            <header><button class="quiet-button" data-action="back"><svg class="icon" aria-hidden="true"><use href="#arrow-left"/></svg>Decks</button><span class="rail-deck">Wild World</span><button class="quiet-button" data-action="pause">Pause</button></header>
+            <div class="stage-ticket"><div class="stage-clue"><div class="word">GIRAFFE</div></div><div class="stage-stub"><div><small>TIME</small><strong class="time">42s</strong></div><div><small>CORRECT</small><strong class="score">4</strong></div></div></div>
+            <div class="round-actions"><button class="physical muted-button" data-action="pass"><svg class="icon" aria-hidden="true"><use href="#arrow-up"/></svg>Pass</button><button class="physical primary-button" data-action="correct"><svg class="icon" aria-hidden="true"><use href="#arrow-down"/></svg>Correct</button></div>
+          </div>
+          <div class="overlay" hidden></div>
+        </section>
+      </div>
+      <footer class="concept-notes"><p><strong>Keep:</strong> Set’s blocky lettering and two-ink print feel. <strong>Trade-off:</strong> ticket details add more visual structure.</p><a href="https://www.pentagram.com/work/the-public-theater" target="_blank" rel="noopener noreferrer">Reference: The Public Theater’s typography</a></footer>
+    </article>
+
+    <section class="closing-note"><h2>What stays in every option</h2><p>Your actual Set fonts. Teal as the one accent. Flat colors, hard edges, readable cards. No gradients, emoji icons, promo copy, or extra text under every control.</p><p>The physical card edges, score flaps and ticket seams are theme proposals, not a return to unrelated decoration. All artwork here is original; the references are inspiration, not copied screens.</p><p><strong>Try it:</strong> tap a deck to see the round. Pass and Correct change sample cards. Use the top controls to compare the same screen in all three. These previews do not use your phone’s sensors or save scores.</p></section>
+  </main>
+  <footer class="page-foot">Off the Top / visual study / 9 September 2026 <a href="theme-notes.md">Reference notes</a></footer>
+
+  <svg class="svg-definitions" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs>
+    <symbol id="arrow-right" viewBox="0 0 24 24"><path d="M4 12h15m-6-6 6 6-6 6"/></symbol>
+    <symbol id="arrow-left" viewBox="0 0 24 24"><path d="M20 12H5m6-6-6 6 6 6"/></symbol>
+    <symbol id="arrow-down" viewBox="0 0 24 24"><path d="M12 4v15m-6-6 6 6 6-6"/></symbol>
+    <symbol id="arrow-up" viewBox="0 0 24 24"><path d="M12 20V5m-6 6 6-6 6 6"/></symbol>
+    <symbol id="check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
+  </defs></svg>
+  <div class="sr-only" role="status" aria-live="polite" id="preview-announcement"></div>
+</body>
+</html>

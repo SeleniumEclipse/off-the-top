@@ -110,7 +110,7 @@ class GameplayFlowTest : OffTheTopUiTest() {
         }
 
         tapText("Change deck", scroll = true)
-        tapText("Recent rounds", scroll = true)
+        tapText("Recent rounds")
         val reviewedHistory = hasClickAction() and hasText("Wild World") and hasText("2")
         compose.onNode(reviewedHistory).performScrollTo().assertIsDisplayed()
             .assertContentDescriptionEquals("Expand answers").performClick()
@@ -151,9 +151,9 @@ class GameplayFlowTest : OffTheTopUiTest() {
             }
             assertTrue(seenWords(deck.id).isEmpty())
             tapText("Back")
-            awaitText("Choose a deck")
+            awaitHome()
         }
-        tapText("Recent rounds", scroll = true)
+        tapText("Recent rounds")
         compose.onNodeWithText(EMPTY_HISTORY).assertIsDisplayed()
         withReloadedModel { assertTrue(it.history.isEmpty()) }
     }
@@ -204,7 +204,7 @@ abstract class OffTheTopUiTest {
 
     @Before
     fun awaitFreshActivity() {
-        awaitText("Choose a deck")
+        awaitHome()
         onModel { model ->
             assertEquals(Screen.HOME, model.screen)
             assertTrue(model.history.isEmpty())
@@ -233,14 +233,26 @@ abstract class OffTheTopUiTest {
     }
 
     protected fun chooseDeck(title: String) {
-        compose.onNode(hasScrollToNodeAction()).performScrollToNode(hasText(title))
-        tapText(title)
+        val deck = onModel { model -> model.decks.single { it.title == title } }
+        // All stacks exist in the horizontal scroll Row; it has ScrollBy, not
+        // LazyColumn's ScrollToIndex/ScrollToNode actions. Titles use printed line breaks.
+        compose.onNodeWithTag("deck-${deck.id}").performScrollTo().assertIsDisplayed()
+            .assertContentDescriptionEquals("Choose ${deck.title}, ${deck.words.size} cards")
+            .assertHasClickAction().performClick()
         awaitText("Start round")
         onModel { assertEquals(title, it.selected.title) }
     }
 
+    protected fun awaitHome() {
+        awaitTag("home")
+        compose.onNodeWithTag("app-title").assertIsDisplayed().assertTextEquals("OFF THE TOP")
+        compose.onNodeWithTag("deck-list").assertIsDisplayed()
+            .assertContentDescriptionEquals("Choose a deck")
+        compose.onNodeWithText("Choose a deck").assertDoesNotExist()
+    }
+
     protected fun useTouchControls() {
-        tapText("Settings", scroll = true)
+        tapText("Settings")
         setToggle("Touch-only mode", true)
         setToggle("Sound effects", false)
         setToggle("Vibration", false)

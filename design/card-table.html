@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Off the Top — Green felt &amp; red backs</title>
+  <link rel="stylesheet" href="card-table.css">
+  <script src="card-table.js" defer></script>
+</head>
+<body>
+  <header class="study-header"><div><a href="theme-options.html?theme=table">Theme study</a><h1>Green felt. Red backs.</h1></div><p>Revised Card Table concept.<br>The Android app is unchanged.</p></header>
+  <nav class="study-controls" aria-label="Preview state">
+    <div role="group" aria-label="Screen"><button data-view="decks" aria-pressed="true">Decks</button><button data-view="round" aria-pressed="false">Round</button><button data-view="correct" aria-pressed="false">Correct feedback</button><button data-view="pass" aria-pressed="false">Pass feedback</button></div>
+    <span>Tap a deck to try the preview.</span>
+  </nav>
+
+  <main>
+    <div class="phone-viewport">
+      <section class="table" aria-label="Casino card-table visual preview">
+        <div class="home-screen">
+          <header class="table-header"><h2>OFF THE TOP</h2><div class="utility"><button data-action="help">How to play</button><button data-action="settings">Settings</button></div></header>
+          <div class="deck-row">
+            <button class="deck" data-deck="wild" aria-label="Play Wild World">
+              <span class="card-back" aria-hidden="true"><svg class="back-print"><use href="#back-print"/></svg></span>
+              <span class="card-face"><span class="deck-corner" aria-hidden="true"><svg class="deck-icon"><use href="#wild-icon"/></svg></span><span class="card-title">WILD<br>WORLD</span><span class="deck-count">622 cards</span><span class="deck-corner opposite" aria-hidden="true"><svg class="deck-icon"><use href="#wild-icon"/></svg></span></span>
+            </button>
+            <button class="deck" data-deck="everyday" aria-label="Play Everyday Things">
+              <span class="card-back" aria-hidden="true"><svg class="back-print"><use href="#back-print"/></svg></span>
+              <span class="card-face"><span class="deck-corner" aria-hidden="true"><svg class="deck-icon"><use href="#everyday-icon"/></svg></span><span class="card-title">EVERYDAY<br>THINGS</span><span class="deck-count">617 cards</span><span class="deck-corner opposite" aria-hidden="true"><svg class="deck-icon"><use href="#everyday-icon"/></svg></span></span>
+            </button>
+            <button class="deck" data-deck="actions" aria-label="Play Do Your Thing">
+              <span class="card-back" aria-hidden="true"><svg class="back-print"><use href="#back-print"/></svg></span>
+              <span class="card-face"><span class="deck-corner" aria-hidden="true"><svg class="deck-icon"><use href="#actions-icon"/></svg></span><span class="card-title">DO YOUR<br>THING</span><span class="deck-count">605 cards</span><span class="deck-corner opposite" aria-hidden="true"><svg class="deck-icon"><use href="#actions-icon"/></svg></span></span>
+            </button>
+          </div>
+          <footer class="table-footer"><button class="quiet" data-action="history">Recent rounds</button><div class="duration" role="group" aria-label="Round length"><button data-duration="30" aria-pressed="false">30s</button><button data-duration="60" aria-pressed="true">60s</button><button data-duration="90" aria-pressed="false">90s</button><button data-duration="120" aria-pressed="false">120s</button></div></footer>
+        </div>
+
+        <div class="round-screen" hidden>
+          <header class="round-header"><button class="quiet" data-action="decks"><svg class="control-icon" aria-hidden="true"><use href="#arrow-left"/></svg>Decks</button><span class="round-deck">Wild World</span><button class="quiet" data-action="pause">Pause</button></header>
+          <div class="play-area">
+            <div class="draw-pile" aria-hidden="true"><svg class="back-print"><use href="#back-print"/></svg></div>
+            <div class="playing-card">
+              <div class="play-corner" aria-hidden="true"><svg class="deck-icon"><use class="active-icon" href="#wild-icon"/></svg></div>
+              <div class="clue"><span class="word">GIRAFFE</span><div class="feedback" hidden><svg class="feedback-icon" aria-hidden="true"><use href="#check"/></svg><strong>Correct</strong></div></div>
+              <div class="play-corner opposite" aria-hidden="true"><svg class="deck-icon"><use class="active-icon" href="#wild-icon"/></svg></div>
+              <div class="card-score" aria-label="4 correct"><svg class="control-icon" aria-hidden="true"><use href="#check"/></svg><span>4</span></div>
+              <div class="card-time" aria-label="42 seconds">42s</div>
+            </div>
+          </div>
+          <footer class="play-controls"><button class="press red-button" data-action="pass"><svg class="control-icon" aria-hidden="true"><use href="#arrow-up"/></svg>Pass</button><button class="press green-button" data-action="correct"><svg class="control-icon" aria-hidden="true"><use href="#arrow-down"/></svg>Correct</button></footer>
+        </div>
+        <div class="dialog" hidden></div>
+      </section>
+    </div>
+
+    <section class="icon-study" aria-label="Original category icon set"><header><h2>Category marks, not card suits</h2><p>Original vector drawings, printed directly on each card.</p></header><div class="icon-row"><figure><img src="icons/wild-world.svg" alt="Leaf icon" width="60" height="60"><figcaption>Wild World</figcaption></figure><figure><img src="icons/everyday-things.svg" alt="Mug icon" width="60" height="60"><figcaption>Everyday Things</figcaption></figure><figure><img src="icons/do-your-thing.svg" alt="Figure in motion icon" width="60" height="60"><figcaption>Do Your Thing</figcaption></figure></div></section>
+    <section class="study-notes"><p><strong>The approved card-table feel:</strong> flat bottle-green background, no table outline, red printed backs, stacked edges, cream faces and mirrored category marks. Set’s fonts and pressed buttons stay.</p><p><strong>Not a gambling game:</strong> no money, betting or casino labels. Green means correct; red means pass. Labels and arrows stay clear without depending on color alone.</p><p>The sample timer is fixed. This page is a visual prototype; the approved direction is being built for Android.</p><a href="theme-notes.md">Design notes</a></section>
+  </main>
+
+  <svg class="svg-library" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs>
+    <symbol id="wild-icon" viewBox="0 0 48 48"><path d="M10 32C7 15 19 7 38 7c1 19-7 31-22 28M8 40 31 17M17 31V22m0 9h10M24 24v-8m0 8h8"/></symbol>
+    <symbol id="everyday-icon" viewBox="0 0 48 48"><path d="M8 16h24v18a5 5 0 0 1-5 5H13a5 5 0 0 1-5-5V16Zm24 3h4a6 6 0 0 1 0 12h-4M6 43h32M15 6v5m10-5v5"/></symbol>
+    <symbol id="actions-icon" viewBox="0 0 48 48"><circle cx="30" cy="8" r="4"/><path d="m15 17 9-2 8 9h9M24 15l-7 15 12 4 4 9M17 30l-6 10H4M15 17l-5 8"/></symbol>
+    <symbol id="arrow-left" viewBox="0 0 24 24"><path d="M20 12H5m6-6-6 6 6 6"/></symbol>
+    <symbol id="arrow-up" viewBox="0 0 24 24"><path d="M12 20V5m-6 6 6-6 6 6"/></symbol>
+    <symbol id="arrow-down" viewBox="0 0 24 24"><path d="M12 4v15m-6-6 6 6 6-6"/></symbol>
+    <symbol id="check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
+    <symbol id="pass" viewBox="0 0 24 24"><path d="M4 12h15m-6-6 6 6-6 6"/></symbol>
+    <pattern id="back-weave" width="16" height="16" patternUnits="userSpaceOnUse"><path d="M-4 4 4-4m-4 16L12 0m-4 20L20 8m-24 4 8 8M0 0l16 16m-4-20 8 8" fill="none" stroke="#f2e8d4" stroke-width="1" opacity=".48"/></pattern>
+    <symbol id="back-print" viewBox="0 0 220 230" preserveAspectRatio="none"><rect width="220" height="230" fill="#a93339"/><rect x="7" y="7" width="206" height="216" rx="2" fill="none" stroke="#f2e8d4" stroke-width="2"/><rect x="13" y="13" width="194" height="204" fill="url(#back-weave)"/><rect x="22" y="22" width="176" height="186" fill="none" stroke="#f2e8d4" stroke-width="1"/><rect x="70" y="74" width="80" height="82" rx="3" fill="#a93339" stroke="#f2e8d4" stroke-width="2"/><path d="M84 101h52m-52 8h52m-52 8h52m-52 8h52" fill="none" stroke="#f2e8d4" stroke-width="2"/></symbol>
+  </defs></svg>
+  <p class="sr-only" id="announcement" aria-live="polite" role="status"></p>
+</body>
+</html>

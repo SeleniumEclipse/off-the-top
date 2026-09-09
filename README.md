@@ -2,7 +2,7 @@
 
 An original, offline Android forehead-guessing party game. Three large decks, no ads, no accounts, no network access. Original content, not affiliated with Heads Up! or its publishers.
 
-**[Download the Android APK](https://github.com/SeleniumEclipse/off-the-top/releases/tag/v1.3.0)** · Android 8.0+
+**[Download the Android APK](https://github.com/SeleniumEclipse/off-the-top/releases/tag/v1.4.0)** · Android 8.0+
 
 ![Off the Top deck selection](screenshots/home.png)
 
@@ -34,13 +34,13 @@ Native Android only; no web backend, authentication, browser or database service
 
 ## Theme and fonts
 
-Print-inspired type and sharp borders with **one teal accent, navy ink and warm ivory paper**. Flat solid backgrounds in both themes. No gradients, glows, emoji icons, decorative pictures or repeated subtitles. Controls use consistent Material Sharp vector icons and clear labels. Archivo Black and Barlow are bundled under their accompanying SIL Open Font License. See [the sourced design rules](DESIGN.md) for the research, decisions and checks that keep these habits from returning.
+The approved **Card Table** theme: flat green background, cream playing-card faces, red printed backs and stacked edges. **No outer table outline.** Original leaf, mug and motion-vector marks identify the three decks instead of card suits or emoji. Green means correct; red means pass. Both day and night retain readable cream cards, with darker felt and slightly dimmer stock at night. Set's Archivo Black/Barlow fonts and pressed-button style remain. No gradients, glows, betting or money mechanics. See [the design rules](DESIGN.md) and [the approved preview](design/card-table.html).
 
 ![Dark mode](screenshots/home-night.png)
 
 ## Validation
 
-134 unit tests and 22 Android tests passed, including design guardrails, vector/accessibility checks and flat-background pixel/contrast checks. The signed update was installed over the earlier app and tested with simulated hardware motion and a real-time countdown. Motion behavior is unchanged from 1.1.0. See [the validation report](VALIDATION.md) for coverage and physical-device limits.
+137 unit tests and 26 Android tests passed, including native card-stack rendering, original vector artwork, green/red feedback, no table outline and enlarged-text collision checks. The signed update was installed over the earlier app and tested with simulated hardware motion and a real-time countdown. The tilt engine, decks and saved-data formats are unchanged. See [the validation report](VALIDATION.md) for coverage and physical-device limits.
 
 ![In-round gameplay](screenshots/playing.png)
 

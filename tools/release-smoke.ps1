@@ -30,16 +30,23 @@ function Capture([string]$Label) {
     & $Adb @device shell screencap -p /sdcard/offthetop-shot.png
     & $Adb @device pull /sdcard/offthetop-shot.png (Join-Path $shots "$Label.png") | Out-Null
 }
+function Tap-Description([string]$Label) {
+    $ui = Read-Ui
+    $node = $ui.SelectNodes('//node') | Where-Object { $_.'content-desc' -eq $Label } | Select-Object -First 1
+    if (!$node) { throw "Accessible control not found: $Label" }
+    $b = [regex]::Matches($node.bounds, '\d+') | ForEach-Object { [int]$_.Value }
+    & $Adb @device shell input tap ([int](($b[0]+$b[2])/2)) ([int](($b[1]+$b[3])/2))
+}
 function Require-Text([string]$Label) {
     $ui = Read-Ui
-    $matches = @($ui.SelectNodes('//node') | Where-Object { $_.text -eq $Label })
-    if (!$matches.Count) { throw "Expected screen text missing: $Label" }
+    $nodes = @($ui.SelectNodes('//node') | Where-Object { $_.text -eq $Label })
+    if (!$nodes.Count) { throw "Expected screen text missing: $Label" }
     Write-Output "PASS: $Label"
 }
 function Require-Description([string]$Label) {
     $ui = Read-Ui
-    $matches = @($ui.SelectNodes('//node') | Where-Object { $_.'content-desc' -eq $Label })
-    if (!$matches.Count) { throw "Expected screen description missing: $Label" }
+    $nodes = @($ui.SelectNodes('//node') | Where-Object { $_.'content-desc' -eq $Label })
+    if (!$nodes.Count) { throw "Expected screen description missing: $Label" }
     Write-Output "PASS: $Label"
 }
 function Disable-Toggle([string]$Label) {
@@ -56,7 +63,7 @@ function Disable-Toggle([string]$Label) {
 
 & $Adb @device shell am force-stop $Package
 & $Adb @device shell am start -W -n "$Package/com.nicgames.offthetop.MainActivity"
-Require-Text 'Choose a deck'
+Require-Text 'OFF THE TOP'
 # A release install retains preferences: normalize only this emulator via its UI.
 Tap-Text 'Settings'
 Tap-Text 'Day'
@@ -66,7 +73,7 @@ Capture 'settings-day'
 Tap-Text 'Back'
 Tap-Text '60s'
 Capture 'home'
-Tap-Text 'Wild World'
+Tap-Description 'Choose Wild World, 622 cards'
 & $Adb @device emu sensor set acceleration 9.81:0:0
 Require-Text 'Start round'
 Require-Text 'Ready'
@@ -120,7 +127,7 @@ Require-Text 'Wild World'
 Write-Output 'PASS: signed-release tilt gameplay, pause, review, themes, and history after process restart'
 Tap-Text 'Back'
 Tap-Text '30s'
-Tap-Text 'Do Your Thing'
+Tap-Description 'Choose Do Your Thing, 605 cards'
 Tap-Text 'Start round'
 $watch = [Diagnostics.Stopwatch]::StartNew()
 do {
@@ -150,7 +157,7 @@ foreach ($direction in @(1, -1)) {
     Tap-Text 'Back'
     Tap-Text '60s'
     Set-Tilt 22 $direction
-    Tap-Text 'Everyday Things'
+    Tap-Description 'Choose Everyday Things, 617 cards'
     Require-Text 'Ready'
     foreach ($degrees in @(16, 10, 4, -2, -8, -12)) { Set-Tilt $degrees $direction }
     Require-Description 'Correct tested'

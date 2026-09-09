@@ -49,19 +49,23 @@ class BackgroundAppearanceTest {
     }
 
     @Test
-    fun solidNightCardIsOpaqueAndDistinctFromSolidPage() {
+    fun solidNightCardFaceIsOpaqueCreamAndDistinctFromSolidGreenPage() {
         renderBackdrop("Night", withCard = true)
         val backdrop = captureBackdrop()
         val card = compose.onNodeWithTag("solid-card").captureToImage().toPixelMap()
-        assertUniformSurface("Night card", card, Night.card)
+        assertUniformSurface("Night card face", card, Night.cardFace)
         samples.forEach { point ->
             // All these samples are outside the centered card.
             assertColorNear("Exposed Night paper at $point", Night.paper, backdrop.at(point))
             assertEquals("Exposed page must be flat at $point", backdrop[0, 0], backdrop.at(point))
         }
-        assertColorNear("Card covers the page center", Night.card, backdrop.at(.5f to .5f))
+        assertColorNear("Cream face covers the page center", Night.cardFace, backdrop.at(.5f to .5f))
         assertTrue("Card must be distinct from the exposed backdrop",
-            colorDistance(card.at(.5f to .5f), backdrop.at(0f to 0f)) > .01f)
+            colorDistance(card.at(.5f to .5f), backdrop.at(0f to 0f)) > .5f)
+        listOf(Night.cardInk, Night.cardMuted, Night.correct, Night.pass).forEach { foreground ->
+            assertTrue("Printed text must contrast with the actual cream face",
+                contrastRatio(foreground, card.at(.5f to .5f)) >= 4.5f)
+        }
     }
 
     private fun assertFlatStaticBackdrop(mode: String, palette: PressColors) {
@@ -111,7 +115,7 @@ class BackgroundAppearanceTest {
                     // Empty in the paper tests: no text or other UI can pollute samples.
                     if (withCard) {
                         Box(Modifier.align(Alignment.Center).size(120.dp, 80.dp)
-                            .background(LocalPress.current.card).testTag("solid-card"))
+                            .background(LocalPress.current.cardFace).testTag("solid-card"))
                     }
                 }
             }

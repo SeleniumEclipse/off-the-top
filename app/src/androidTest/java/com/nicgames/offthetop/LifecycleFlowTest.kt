@@ -182,7 +182,7 @@ class LifecycleFlowTest : OffTheTopUiTest() {
         onModel { assertEquals(recordId, it.history.single().id) }
 
         tapText("Change deck", scroll = true)
-        tapText("Recent rounds", scroll = true)
+        tapText("Recent rounds")
         compose.onNode(hasClickAction() and hasText("Do Your Thing") and hasText("0"))
             .assertIsDisplayed().assertContentDescriptionEquals("Expand answers").performClick()
         assertHistoryAnswer(word, Outcome.UNANSWERED)

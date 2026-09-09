@@ -20,24 +20,35 @@ import kotlin.math.sin
 class QuietUiTest : OffTheTopUiTest() {
     @Test
     fun homeShowsOnlyShortDeckDetails_andHelpStillExplainsTheGame() {
-        compose.onNodeWithTag("deck-heading").assertIsDisplayed().assertTextEquals("Choose a deck")
-        compose.onAllNodesWithText("Choose a deck").assertCountEquals(1)
-        compose.onNodeWithText("Recent rounds").performScrollTo().assertHasClickAction()
+        awaitHome()
+        compose.onAllNodesWithTag("app-title").assertCountEquals(1)
+        compose.onNodeWithTag("deck-list")
+            .assert(SemanticsMatcher.keyIsDefined(SemanticsActions.ScrollBy))
+            .assert(SemanticsMatcher.keyIsDefined(SemanticsProperties.HorizontalScrollAxisRange))
+            .assert(SemanticsMatcher.keyNotDefined(SemanticsProperties.VerticalScrollAxisRange))
+        listOf("Settings", "How to play", "Recent rounds").forEach { label ->
+            compose.onNodeWithText(label).assertIsDisplayed().assertHasClickAction()
+        }
         assertNoCopy("THE FOREHEAD GUESSING GAME", "Good clues.", "One phone.", "ALL OFFLINE", "NO ADS")
 
         val decks = onModel { it.decks.toList() }
         assertEquals(3, decks.size)
         decks.forEach { deck ->
-            compose.onNode(hasScrollToNodeAction()).performScrollToNode(hasText(deck.title))
-            compose.onNodeWithContentDescription("Choose ${deck.title}, ${deck.words.size} cards")
+            val printedTitle = when (deck.id) {
+                "wild-world" -> "WILD\nWORLD"
+                "everyday" -> "EVERYDAY\nTHINGS"
+                else -> "DO YOUR\nTHING"
+            }
+            compose.onNodeWithTag("deck-${deck.id}").performScrollTo()
                 .assertIsDisplayed().assertHasClickAction()
-                .assertTextEquals(deck.title, "${deck.words.size} cards")
+                .assertTextEquals(printedTitle, "${deck.words.size} cards")
                 .assertContentDescriptionEquals("Choose ${deck.title}, ${deck.words.size} cards")
+            compose.onAllNodesWithTag("category-${deck.id}", useUnmergedTree = true).assertCountEquals(2)
             assertNoCopy(deck.subtitle, deck.examples, "Nature", "Objects & food", "Actions & places")
             assertNoGlyphIconText()
         }
 
-        tapText("How to play", scroll = true)
+        tapText("How to play")
         awaitText("How to play")
         onModel { assertEquals(Screen.HELP, it.screen) }
         for (heading in listOf("Hold", "Guess", "Tilt", "Score")) {
@@ -51,7 +62,7 @@ class QuietUiTest : OffTheTopUiTest() {
         assertNoCopy("A little help up top", "GOOD TO KNOW")
         assertNoGlyphIconText()
         tapText("Back")
-        awaitText("Choose a deck")
+        awaitHome()
         onModel { assertEquals(Screen.HOME, it.screen); assertTrue(it.history.isEmpty()) }
     }
 
@@ -63,7 +74,7 @@ class QuietUiTest : OffTheTopUiTest() {
                 manager.getDefaultSensor(Sensor.TYPE_GRAVITY) != null
         }
         assumeTrue("Tilt setup requires an accelerometer or gravity sensor", sensorsAvailable)
-        tapText("Settings", scroll = true)
+        tapText("Settings")
         setToggle("Sound effects", false)
         setToggle("Vibration", false)
         assertToggle("Touch-only mode", false)
@@ -141,13 +152,13 @@ class QuietUiTest : OffTheTopUiTest() {
         compose.onNodeWithText("Reset tilt").assertDoesNotExist()
         compose.onNodeWithText("Tilt setup").assertIsDisplayed()
         tapText("Back")
-        awaitText("Choose a deck")
+        awaitHome()
     }
 
     @Test
     fun touchRoundKeepsCountdownPlayPauseAndResultsQuiet_withoutLosingScore() {
         useTouchControls()
-        tapText("Settings", scroll = true)
+        tapText("Settings")
         for (label in listOf("Sound effects", "Vibration", "Touch-only mode", "Gentle tilts")) {
             compose.onNodeWithText(label).performScrollTo().assertIsDisplayed()
             compose.onNodeWithContentDescription(label).assertHasClickAction()
@@ -168,7 +179,8 @@ class QuietUiTest : OffTheTopUiTest() {
 
         tapText("Start round")
         assertCountdown()
-        assertNoCopy("PHONE TO FOREHEAD", "Screen facing your friends.", "WILD WORLD")
+        assertNoCopy("PHONE TO FOREHEAD", "Screen facing your friends.")
+        assertSelectedDeckHeaderAndMarkers()
         val first = awaitWord()
         assertLiveScore(0)
         assertScoringButtons()
@@ -178,7 +190,8 @@ class QuietUiTest : OffTheTopUiTest() {
         assertLiveScore(1)
         assertScoringButtons()
         compose.onNodeWithTag("live-tilt-status").assertTextEquals("")
-        assertNoCopy("FRIENDS TAP TO SCORE", "Return to your starting angle", "↓ GOT IT · ↑ PASS", "WILD WORLD")
+        assertNoCopy("FRIENDS TAP TO SCORE", "Return to your starting angle", "↓ GOT IT · ↑ PASS")
+        assertSelectedDeckHeaderAndMarkers()
 
         tapText("Pause")
         assertPaused()
@@ -202,7 +215,7 @@ class QuietUiTest : OffTheTopUiTest() {
             listOf(Answer(first, Outcome.CORRECT), Answer(second, Outcome.UNANSWERED)))
 
         tapText("Change deck", scroll = true)
-        tapText("Recent rounds", scroll = true)
+        tapText("Recent rounds")
         assertHistoryDisclosure("Expand answers").performClick()
         assertHistoryAnswer(first, Outcome.CORRECT)
         assertHistoryAnswer(second, Outcome.UNANSWERED)
@@ -219,7 +232,23 @@ class QuietUiTest : OffTheTopUiTest() {
     private fun assertPracticeInstruction() {
         compose.onNodeWithText("Hold at your forehead,\nfacing your friends.")
             .performScrollTo().assertIsDisplayed()
+        val selected = onModel { it.selected }
+        compose.onNodeWithTag("category-${selected.id}", useUnmergedTree = true)
+            .performScrollTo().assertIsDisplayed()
         assertNoCopy("Phone to forehead", "Hold still. Screen facing friends.")
+        assertNoGlyphIconText()
+    }
+
+    private fun assertSelectedDeckHeaderAndMarkers() {
+        val selected = onModel { it.selected }
+        // The new round header deliberately identifies the deck once. Do not ban
+        // its name as filler, or accidentally allow duplicate headings/captions.
+        compose.onAllNodesWithText(selected.title, ignoreCase = true, useUnmergedTree = true)
+            .assertCountEquals(1)
+        compose.onNodeWithText(selected.title).assertIsDisplayed()
+        compose.onNodeWithText("Pause").assertIsDisplayed().assertHasClickAction()
+        compose.onAllNodesWithTag("category-${selected.id}", useUnmergedTree = true).assertCountEquals(2)
+        assertNoCopy(selected.subtitle, selected.examples, "${selected.words.size} cards")
         assertNoGlyphIconText()
     }
 

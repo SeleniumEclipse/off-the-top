@@ -14,7 +14,7 @@ import org.junit.runner.RunWith
 class SettingsFlowTest : OffTheTopUiTest() {
     @Test
     fun allFourTogglesPersistAcrossRecreation_andCanBeChangedBack() {
-        tapText("Settings", scroll = true)
+        tapText("Settings")
         assertToggleSettings(sound = true, vibration = true, touch = false, gentle = false, saved = false)
 
         setToggle("Sound effects", false)
@@ -31,7 +31,7 @@ class SettingsFlowTest : OffTheTopUiTest() {
         setToggle("Touch-only mode", false)
         setToggle("Gentle tilts", false)
         tapText("Back")
-        tapText("Settings", scroll = true)
+        tapText("Settings")
         compose.activityRule.scenario.recreate()
         awaitText("Settings")
         assertToggleSettings(sound = true, vibration = true, touch = false, gentle = false)
@@ -40,7 +40,7 @@ class SettingsFlowTest : OffTheTopUiTest() {
 
     @Test
     fun allRoundLengthsAndPaperThemesPersist_andRenderTheirSelection() {
-        tapText("Settings", scroll = true)
+        tapText("Settings")
         tapText("Day", scroll = true)
         assertPaperTheme("Day", Day.ink)
 
@@ -84,7 +84,7 @@ class SettingsFlowTest : OffTheTopUiTest() {
 
     @Test
     fun helpAndEmptyHistoryRemainUsableAfterRecreation() {
-        tapText("How to play", scroll = true)
+        tapText("How to play")
         awaitText("How to play")
         for (heading in listOf("Hold", "Guess", "Tilt", "Score")) {
             compose.onNodeWithText(heading).performScrollTo().assertIsDisplayed()
@@ -93,7 +93,7 @@ class SettingsFlowTest : OffTheTopUiTest() {
         compose.activityRule.scenario.recreate()
         awaitText("How to play")
         tapText("Back")
-        tapText("Recent rounds", scroll = true)
+        tapText("Recent rounds")
         awaitText("Recent rounds")
         compose.onNodeWithText(EMPTY_HISTORY).assertIsDisplayed()
         compose.onNodeWithContentDescription("Expand answers").assertDoesNotExist()
@@ -144,7 +144,7 @@ class SettingsFlowTest : OffTheTopUiTest() {
         // colors as well as model/prefs, rather than asserting that every label exists.
         for (value in listOf(30, 60, 90, 120)) {
             compose.onNodeWithText("${value}s").performScrollTo().assertIsDisplayed()
-            assertTextColor("${value}s", if (value == seconds) Day.onAccent else Day.ink)
+            assertTextColor("${value}s", if (value == seconds) Day.cardInk else Day.ink)
         }
     }
 

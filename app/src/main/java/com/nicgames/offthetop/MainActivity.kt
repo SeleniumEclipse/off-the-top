@@ -9,6 +9,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -129,33 +130,23 @@ class MainActivity : ComponentActivity() {
 
 @Composable private fun HomeScreen(model: AppModel) {
     val p = LocalPress.current
-    Row(Modifier.fillMaxSize(), horizontalArrangement = Arrangement.spacedBy(28.dp)) {
-        Column(Modifier.weight(0.36f).fillMaxHeight().verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-            Spacer(Modifier.height(8.dp))
-            Text("OFF\nTHE TOP", color = p.ink, fontFamily = Headline, fontSize = 48.sp, lineHeight = 48.sp)
-            Spacer(Modifier.height(8.dp))
-            PressButton("How to play", { model.screen = Screen.HELP }, Modifier.fillMaxWidth())
-            PressButton("Settings", { model.screen = Screen.SETTINGS }, Modifier.fillMaxWidth())
-            Text("Recent rounds", Modifier.heightIn(min = 48.dp).fillMaxWidth().clickable(role = Role.Button) { model.screen = Screen.HISTORY }.padding(vertical = 10.dp),
-                color = p.ink, fontWeight = FontWeight.Bold)
-        }
-        Column(Modifier.weight(0.64f).fillMaxHeight()) {
-            Text("Choose a deck", color = p.muted, fontSize = 16.sp, modifier = Modifier.padding(bottom = 14.dp).testTag("deck-heading"))
-            LazyColumn(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(12.dp), contentPadding = PaddingValues(bottom = 6.dp)) {
-                itemsIndexed(model.decks) { _, deck ->
-                    Row(Modifier.fillMaxWidth().border(2.dp, p.edge).background(p.card).clickable(role = Role.Button) { model.choose(deck) }
-                        .semantics { contentDescription = "Choose ${deck.title}, ${deck.words.size} cards" }
-                        .heightIn(min = 80.dp).padding(horizontal = 18.dp, vertical = 14.dp),
-                        verticalAlignment = Alignment.CenterVertically) {
-                        Text(deck.title, color = p.ink, fontFamily = Headline, fontSize = 23.sp, modifier = Modifier.weight(1f).padding(end = 12.dp))
-                        Text("${deck.words.size} cards", fontFamily = Body, color = p.muted, fontSize = 13.sp)
-                    }
-                }
+    BoxWithConstraints(Modifier.fillMaxSize().testTag("home")) {
+        val deckWidth = ((maxWidth - 32.dp) / 3).coerceAtLeast(175.dp)
+        Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                Text("OFF THE TOP", color = p.ink, fontFamily = Headline, fontSize = 28.sp,
+                    modifier = Modifier.weight(1f).testTag("app-title"))
+                PressButton("How to play", { model.screen = Screen.HELP })
+                PressButton("Settings", { model.screen = Screen.SETTINGS })
             }
-            Row(Modifier.fillMaxWidth().padding(top = 6.dp), verticalAlignment = Alignment.CenterVertically) {
-                Text("Time", color = p.muted, fontSize = 14.sp)
-                Spacer(Modifier.width(12.dp))
-                DurationPicker(model, Modifier.weight(1f))
+            Row(Modifier.weight(1f).fillMaxWidth().horizontalScroll(rememberScrollState()).testTag("deck-list")
+                .semantics { contentDescription = "Choose a deck" }, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                model.decks.forEach { deck -> DeckStack(deck, { model.choose(deck) }, Modifier.width(deckWidth).fillMaxHeight()) }
+            }
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                TextButton(onClick = { model.screen = Screen.HISTORY }) { Text("Recent rounds", color = p.ink) }
+                Spacer(Modifier.weight(1f))
+                DurationPicker(model, Modifier.widthIn(max = 300.dp).weight(.8f, fill = false))
             }
         }
     }
@@ -165,9 +156,9 @@ class MainActivity : ComponentActivity() {
     val p = LocalPress.current
     Row(modifier.border(1.dp, p.edge)) {
         listOf(30, 60, 90, 120).forEach { value ->
-            Box(Modifier.weight(1f).background(if (model.seconds == value) p.accent else p.card).clickable { model.changeSeconds(value) }
+            Box(Modifier.weight(1f).background(if (model.seconds == value) p.cardFace else p.card).clickable { model.changeSeconds(value) }
                 .heightIn(min = 48.dp).padding(8.dp), contentAlignment = Alignment.Center) {
-                Text("${value}s", fontWeight = FontWeight.Bold, color = if (model.seconds == value) p.onAccent else p.ink)
+                Text("${value}s", fontWeight = FontWeight.Bold, color = if (model.seconds == value) p.cardInk else p.ink)
             }
         }
     }
@@ -180,11 +171,13 @@ class MainActivity : ComponentActivity() {
         Header(model.selected.title, model::home)
         Row(Modifier.weight(1f), horizontalArrangement = Arrangement.spacedBy(24.dp)) {
             Column(Modifier.weight(1f).fillMaxHeight().verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.Center) {
+                CategoryIcon(model.selected.id, Modifier.size(50.dp), p.ink)
+                Spacer(Modifier.height(12.dp))
                 Text("Hold at your forehead,\nfacing your friends.", fontFamily = Headline, fontSize = 25.sp, lineHeight = 32.sp, color = p.ink)
             }
             Column(Modifier.weight(1f).fillMaxHeight().verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically)) {
-                Instruction(Icons.Sharp.KeyboardArrowDown, "Correct", p.accent, model.practicedCorrect)
-                Instruction(Icons.Sharp.KeyboardArrowUp, "Pass", p.ink, model.practicedPass)
+                Instruction(Icons.Sharp.KeyboardArrowDown, "Correct", p.correct, model.practicedCorrect)
+                Instruction(Icons.Sharp.KeyboardArrowUp, "Pass", p.pass, model.practicedPass)
                 Text(if (sensors && !model.touchOnly) shortTiltStatus(model) else "Touch controls",
                     Modifier.fillMaxWidth().testTag("practice-feedback"), fontWeight = FontWeight.SemiBold, fontSize = 15.sp, color = p.muted)
                 if (sensors && !model.touchOnly) {
@@ -210,11 +203,11 @@ private fun shortTiltStatus(model: AppModel): String = when (model.tiltStatus) {
 }
 
 @Composable private fun Instruction(arrow: ImageVector, label: String, color: Color, done: Boolean) {
-    Row(Modifier.fillMaxWidth().background(LocalPress.current.card).border(1.dp, LocalPress.current.edge)
+    Row(Modifier.fillMaxWidth().background(LocalPress.current.cardFace).border(1.dp, LocalPress.current.cardInk)
         .semantics { contentDescription = "$label ${if (done) "tested" else "tilt"}" }.padding(horizontal = 16.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
         Icon(arrow, contentDescription = null, tint = color, modifier = Modifier.size(30.dp))
         Spacer(Modifier.width(14.dp))
-        Text(label, color = LocalPress.current.ink, fontWeight = FontWeight.Bold, fontSize = 21.sp, modifier = Modifier.weight(1f))
+        Text(label, color = LocalPress.current.cardInk, fontWeight = FontWeight.Bold, fontSize = 21.sp, modifier = Modifier.weight(1f))
         if (done) Icon(Icons.Sharp.Check, contentDescription = null, tint = color, modifier = Modifier.size(24.dp))
     }
 }
@@ -237,43 +230,47 @@ private fun shortTiltStatus(model: AppModel): String = when (model.tiltStatus) {
         Phase.COUNTDOWN, Phase.READY -> {
             Column(Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                    Text(model.selected.title, color = p.muted)
                     Spacer(Modifier.weight(1f)); PressButton("Pause", model::pause)
                 }
-                Column(Modifier.weight(1f), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("${r.countdown}", fontFamily = Headline, fontSize = 92.sp, lineHeight = 100.sp, color = p.accent, modifier = Modifier.testTag("countdown"))
-                    Text("Hold still at your forehead", color = p.muted)
+                PlayingCard(model.selected.id, Modifier.weight(1f).fillMaxWidth()) {
+                    BoxWithConstraints(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text("${r.countdown}", fontFamily = Headline, fontSize = (maxHeight.value * .65f).coerceIn(36f, 92f).sp,
+                            color = p.correct, modifier = Modifier.testTag("countdown"))
+                    }
                 }
+                Text("Hold still at your forehead", color = p.muted, modifier = Modifier.padding(vertical = 10.dp))
             }
         }
         Phase.PLAYING -> {
             val score = r.score
+            val feedback = r.feedback
             Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                    Row(Modifier.weight(1f).testTag("live-score").semantics(mergeDescendants = true) { contentDescription = "$score correct" },
-                        verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Icon(Icons.Sharp.Check, contentDescription = null, tint = p.accent, modifier = Modifier.size(28.dp))
-                        Text("$score", color = p.accent, fontWeight = FontWeight.Bold, fontSize = 24.sp)
-                    }
+                    Text(model.selected.title, color = p.muted, modifier = Modifier.weight(1f))
                     PressButton("Pause", model::pause)
-                    Text("${ceil(r.remainingMs / 1000.0).toInt()}s", Modifier.weight(1f).testTag("timer"), textAlign = TextAlign.End,
-                        color = if (r.remainingMs <= 10_000) p.accent else p.ink, fontFamily = Headline, fontSize = 30.sp)
                 }
-                val progress = r.remainingMs.toFloat() / (r.durationSeconds * 1000f)
-                Box(Modifier.fillMaxWidth().height(4.dp).background(p.ink.copy(alpha = .12f))) {
-                    Box(Modifier.fillMaxWidth(progress.coerceIn(0f, 1f)).fillMaxHeight().background(p.accent))
-                }
-                val feedback = r.feedback
-                val cardColor = when (feedback) { Outcome.CORRECT -> p.accent; Outcome.PASS -> p.ink; else -> p.card }
-                val feedbackInk = if (feedback == Outcome.CORRECT) p.onAccent else p.paper
-                Box(Modifier.weight(1f).fillMaxWidth().border(2.dp, p.edge).background(cardColor).padding(horizontal = 24.dp, vertical = 10.dp), contentAlignment = Alignment.Center) {
+                PlayingCard(model.selected.id, Modifier.weight(1f).fillMaxWidth().testTag("playing-card"), feedback,
+                    topEnd = {
+                        Text("${ceil(r.remainingMs / 1000.0).toInt()}s", Modifier.testTag("timer"),
+                            color = if (r.remainingMs <= 10_000) p.pass else p.cardInk, fontFamily = Body, fontWeight = FontWeight.Bold, fontSize = 24.sp)
+                    }, bottomStart = {
+                        Row(Modifier.testTag("live-score").semantics(mergeDescendants = true) { contentDescription = "$score correct" },
+                            verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                            Icon(Icons.Sharp.Check, contentDescription = null, tint = p.correct, modifier = Modifier.size(24.dp))
+                            Text("$score", color = p.correct, fontWeight = FontWeight.Bold, fontSize = 24.sp)
+                        }
+                    }) {
                     if (feedback != null) Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(18.dp)) {
+                        val feedbackInk = if (feedback == Outcome.CORRECT) p.correct else p.pass
                         Icon(if (feedback == Outcome.CORRECT) Icons.Sharp.Check else Icons.AutoMirrored.Sharp.ArrowForward,
-                            contentDescription = null, tint = feedbackInk, modifier = Modifier.size(52.dp))
-                        Text(if (feedback == Outcome.CORRECT) "Correct" else "Pass", fontFamily = Headline, fontSize = 48.sp, color = feedbackInk)
-                    } else AutoWord(r.currentWord.orEmpty(), model::revealWord)
+                            contentDescription = null, tint = feedbackInk, modifier = Modifier.size(44.dp))
+                        Text(if (feedback == Outcome.CORRECT) "Correct" else "Pass", fontFamily = Headline, fontSize = 40.sp, color = feedbackInk,
+                            modifier = Modifier.testTag("feedback-${feedback.name.lowercase()}"))
+                    } else AutoWord(r.currentWord.orEmpty(), p.cardInk, model::revealWord)
                 }
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(18.dp), verticalAlignment = Alignment.CenterVertically) {
-                    PressButton("Pass", { model.mark(Outcome.PASS) }, Modifier.weight(1f).testTag("pass"), enabled = feedback == null, icon = Icons.Sharp.KeyboardArrowUp)
+                    PressButton("Pass", { model.mark(Outcome.PASS) }, Modifier.weight(1f).testTag("pass"), enabled = feedback == null, icon = Icons.Sharp.KeyboardArrowUp, pass = true)
                     Text(if (model.touchOnly || model.tilt.armed) "" else shortTiltStatus(model), Modifier.weight(1f).testTag("live-tilt-status"), textAlign = TextAlign.Center, fontSize = 14.sp, color = p.muted)
                     PressButton("Correct", { model.mark(Outcome.CORRECT) }, Modifier.weight(1f).testTag("correct"), primary = true, enabled = feedback == null, icon = Icons.Sharp.KeyboardArrowDown)
                 }
@@ -283,6 +280,10 @@ private fun shortTiltStatus(model: AppModel): String = when (model.tiltStatus) {
 }
 
 @Composable internal fun AutoWord(word: String, onShown: (String) -> Unit) {
+    AutoWord(word, LocalPress.current.ink, onShown)
+}
+
+@Composable internal fun AutoWord(word: String, color: Color, onShown: (String) -> Unit) {
     BoxWithConstraints(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         val density = LocalDensity.current
         val measurer = rememberTextMeasurer()
@@ -298,7 +299,7 @@ private fun shortTiltStatus(model: AppModel): String = when (model.tiltStatus) {
             } while (true)
             chosen
         }
-        Text(word.uppercase(), style = style, color = LocalPress.current.ink, maxLines = 3,
+        Text(word.uppercase(), style = style, color = color, maxLines = 3,
             onTextLayout = { if (!it.hasVisualOverflow) onShown(word) }, modifier = Modifier.testTag("word"))
     }
 }
@@ -308,9 +309,12 @@ private fun shortTiltStatus(model: AppModel): String = when (model.tiltStatus) {
     Row(Modifier.fillMaxSize(), horizontalArrangement = Arrangement.spacedBy(28.dp)) {
         Column(Modifier.weight(.38f).fillMaxHeight().verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text("Results", fontFamily = Headline, fontSize = 28.sp, color = p.ink, modifier = Modifier.testTag("results-heading"))
-            Row(verticalAlignment = Alignment.Bottom) {
-                Text("$score", fontFamily = Headline, fontSize = 76.sp, lineHeight = 80.sp, color = p.accent, modifier = Modifier.testTag("final-score"))
-                Text(" correct", color = p.muted, modifier = Modifier.padding(bottom = 10.dp))
+            CardFace(Modifier.fillMaxWidth().height(130.dp)) {
+                CategoryIcon(model.selected.id, Modifier.align(Alignment.TopEnd).padding(12.dp).size(28.dp))
+                Row(Modifier.align(Alignment.Center).padding(horizontal = 16.dp), verticalAlignment = Alignment.Bottom) {
+                    Text("$score", fontFamily = Headline, fontSize = 68.sp, lineHeight = 74.sp, color = p.correct, modifier = Modifier.testTag("final-score"))
+                    Text(" correct", color = p.cardMuted, modifier = Modifier.padding(bottom = 10.dp))
+                }
             }
             Text("${answers.count { it.outcome == Outcome.PASS }} passed · ${answers.count { it.outcome == Outcome.UNANSWERED }} unanswered", color = p.muted)
             Spacer(Modifier.height(12.dp))
@@ -321,8 +325,8 @@ private fun shortTiltStatus(model: AppModel): String = when (model.tiltStatus) {
             Text("Answers", fontFamily = Headline, fontSize = 22.sp, color = p.ink, modifier = Modifier.padding(vertical = 6.dp))
             Spacer(Modifier.height(10.dp))
             Rule()
-            LazyColumn(Modifier.weight(1f)) {
-                if (answers.isEmpty()) item { Text("No cards played", Modifier.padding(16.dp), color = p.muted) }
+            LazyColumn(Modifier.weight(1f).background(p.cardFace).padding(horizontal = 14.dp)) {
+                if (answers.isEmpty()) item { Text("No cards played", Modifier.padding(16.dp), color = p.cardMuted) }
                 itemsIndexed(answers) { index, answer -> AnswerRow(answer, Modifier.testTag("answer-$index"), { model.review(index) }) }
             }
         }
@@ -331,13 +335,13 @@ private fun shortTiltStatus(model: AppModel): String = when (model.tiltStatus) {
 
 @Composable private fun AnswerRow(answer: Answer, modifier: Modifier = Modifier, onClick: (() -> Unit)? = null) {
     val p = LocalPress.current
-    val color = when (answer.outcome) { Outcome.CORRECT -> p.accent; Outcome.PASS -> p.ink; else -> p.muted }
+    val color = when (answer.outcome) { Outcome.CORRECT -> p.correct; Outcome.PASS -> p.pass; else -> p.cardMuted }
     val icon = when (answer.outcome) { Outcome.CORRECT -> Icons.Sharp.Check; Outcome.PASS -> Icons.AutoMirrored.Sharp.ArrowForward; else -> Icons.Sharp.Close }
     val description = when (answer.outcome) { Outcome.CORRECT -> "Correct"; Outcome.PASS -> "Passed"; else -> "Unanswered" }
-    Column(modifier.semantics(mergeDescendants = true) { contentDescription = "${answer.word}, $description" }
+    Column(modifier.background(p.cardFace).semantics(mergeDescendants = true) { contentDescription = "${answer.word}, $description" }
         .then(if (onClick != null) Modifier.clickable(role = Role.Button, onClickLabel = "Change result", onClick = onClick) else Modifier)) {
         Row(Modifier.fillMaxWidth().heightIn(min = 52.dp).padding(vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
-            Text(answer.word, Modifier.weight(1f).padding(end = 12.dp), color = p.ink, fontWeight = FontWeight.SemiBold, fontSize = 17.sp)
+            Text(answer.word, Modifier.weight(1f).padding(end = 12.dp), color = p.cardInk, fontWeight = FontWeight.SemiBold, fontSize = 17.sp)
             Icon(icon, contentDescription = null, tint = color, modifier = Modifier.size(24.dp))
         }
         Rule()
