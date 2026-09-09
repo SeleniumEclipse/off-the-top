@@ -34,7 +34,7 @@ import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
 
-/** Four bounded checks: native artwork/surfaces, real scoring callbacks, and compact type. */
+/** Native artwork/surfaces, real scoring callbacks, and compact type for all six decks. */
 @RunWith(AndroidJUnit4::class)
 class CardTableAppearanceTest : OffTheTopUiTest() {
     private data class Category(val id: String, val title: String, val printed: String, val resource: Int)
@@ -42,6 +42,9 @@ class CardTableAppearanceTest : OffTheTopUiTest() {
         Category("wild-world", "Wild World", "WILD\nWORLD", R.drawable.category_wild),
         Category("everyday", "Everyday Things", "EVERYDAY\nTHINGS", R.drawable.category_everyday),
         Category("do-your-thing", "Do Your Thing", "DO YOUR\nTHING", R.drawable.category_actions),
+        Category("characters", "Characters", "CHARACTERS", R.drawable.category_characters),
+        Category("silent-acting", "Silent Acting", "SILENT\nACTING", R.drawable.category_silent),
+        Category("food-drink", "Food & Drink", "FOOD &\nDRINK", R.drawable.category_food),
     )
     private var mode by mutableStateOf("Day")
     private var selected by mutableStateOf(categories.first())
@@ -49,7 +52,17 @@ class CardTableAppearanceTest : OffTheTopUiTest() {
 
     @Test
     fun threeNativeStacksPaintOriginalVectors_andChooseTheirAccessibleDeck() {
-        val decks = onModel { it.decks.toList() }
+        assertNativeStacks(onModel { it.decks.take(3) }, categories.take(3))
+    }
+
+    @Test
+    fun threeExpansionStacksPaintTheirOwnOriginalVectors_andChooseTheirAccessibleDeck() {
+        assertNativeStacks(onModel { it.decks.drop(3) }, categories.drop(3))
+    }
+
+    private fun assertNativeStacks(decks: List<Deck>, categories: List<Category>) {
+        assertEquals("Isolate one page, not six squeezed stacks", 3, decks.size)
+        assertEquals(decks.map { it.id }, categories.map { it.id })
         val chosen = mutableListOf<String>()
         installIsolatedContent {
             val p = LocalPress.current
@@ -81,8 +94,10 @@ class CardTableAppearanceTest : OffTheTopUiTest() {
                 .assert(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Button))
                 .assertContentDescriptionEquals("Choose ${category.title}, ${deck.words.size} cards")
                 .assertTextEquals(category.printed, "${deck.words.size} cards")
-            val title = readLayout(compose.onNodeWithText(category.printed, useUnmergedTree = true))
-            assertFalse("Printed title must fit: ${category.title}", title.hasVisualOverflow)
+            val title = assertTextFitsActualNode(compose.onNodeWithText(category.printed, useUnmergedTree = true))
+            if (category.id == "characters") {
+                assertEquals("Never split CHARACTERS in the middle of the word", 1, title.lineCount)
+            } else assertEquals("Printed title must keep its approved line breaks: ${category.title}", 2, title.lineCount)
             val countLayout = assertTextFitsActualNode(
                 compose.onNodeWithText("${deck.words.size} cards", useUnmergedTree = true))
             assertEquals("Card count must remain a single line: ${category.title}", 1, countLayout.lineCount)
@@ -108,6 +123,45 @@ class CardTableAppearanceTest : OffTheTopUiTest() {
             assertNull(model.round)
             assertTrue(model.history.isEmpty())
             decks.forEach { assertTrue(seenWords(it.id).isEmpty()) }
+        }
+    }
+
+    @Test
+    fun expansionTitlesFitBothPageCardWidthsAtThreeFontScales_withoutCoveringCountsOrMarks() {
+        val decks = onModel { it.decks.drop(3) }
+        var cardWidth by mutableStateOf(206)
+        selected = categories[3]
+        installIsolatedContent {
+            PageBackground(Modifier.size(340.dp, 270.dp)) {
+                DeckStack(decks.single { it.id == selected.id }, {},
+                    Modifier.size(cardWidth.dp, 225.dp))
+            }
+        }
+        // About 206dp per stack at the wide three-card breakpoint; 316dp on
+        // the narrow two-card page. Do not hide a long title by using a wider fixture.
+        for (width in listOf(206, 316)) for (scale in listOf(1f, 1.3f, 2f)) {
+            categories.drop(3).forEach { category ->
+                compose.runOnIdle { cardWidth = width; fontScale = scale; selected = category }
+                val titleNode = compose.onNodeWithText(category.printed, useUnmergedTree = true)
+                val layout = assertTextFitsActualNode(titleNode)
+                assertEquals(scale, layout.layoutInput.density.fontScale, 0f)
+                assertEquals("Do not insert decorative breaks or replace the title", category.printed, layout.layoutInput.text.text)
+                if (category.id == "characters") {
+                    assertEquals("Shrink the full title instead of splitting CHARACTERS", 1, layout.lineCount)
+                } else assertEquals("Keep the approved two-line title", 2, layout.lineCount)
+                val countNode = compose.onNodeWithText("${decks.single { it.id == category.id }.words.size} cards",
+                    useUnmergedTree = true)
+                assertEquals(1, assertTextFitsActualNode(countNode).lineCount)
+                val corners = compose.onAllNodesWithTag("category-${category.id}", useUnmergedTree = true)
+                    .assertCountEquals(2).fetchSemanticsNodes().map { it.boundsInRoot }
+                val countLines = textLineBounds(countNode)
+                textLineBounds(titleNode).forEach { line ->
+                    (corners + countLines).forEach { reserved ->
+                        assertFalse("${category.title}, width=$width, font=$scale overlaps a count or mark", line.overlaps(reserved))
+                    }
+                }
+                assertNoSuitOrGlyphText()
+            }
         }
     }
 

@@ -9,7 +9,8 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -49,6 +50,7 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.text.DateFormat
 import java.util.Date
 import kotlin.math.ceil
@@ -131,7 +133,12 @@ class MainActivity : ComponentActivity() {
 @Composable private fun HomeScreen(model: AppModel) {
     val p = LocalPress.current
     BoxWithConstraints(Modifier.fillMaxSize().testTag("home")) {
-        val deckWidth = ((maxWidth - 32.dp) / 3).coerceAtLeast(175.dp)
+        val perPage = if (maxWidth < 650.dp) 2 else 3
+        val separateDurationRow = maxWidth < 650.dp || LocalDensity.current.fontScale > 1.3f
+        val groups = remember(model.decks, perPage) { model.decks.chunked(perPage) }
+        val pager = rememberPagerState(initialPage = model.deckPage.coerceIn(groups.indices)) { groups.size }
+        val scope = rememberCoroutineScope()
+        LaunchedEffect(pager.currentPage) { model.deckPage = pager.currentPage }
         Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 Text("OFF THE TOP", color = p.ink, fontFamily = Headline, fontSize = 28.sp,
@@ -139,14 +146,33 @@ class MainActivity : ComponentActivity() {
                 PressButton("How to play", { model.screen = Screen.HELP })
                 PressButton("Settings", { model.screen = Screen.SETTINGS })
             }
-            Row(Modifier.weight(1f).fillMaxWidth().horizontalScroll(rememberScrollState()).testTag("deck-list")
-                .semantics { contentDescription = "Choose a deck" }, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                model.decks.forEach { deck -> DeckStack(deck, { model.choose(deck) }, Modifier.width(deckWidth).fillMaxHeight()) }
+            HorizontalPager(pager, Modifier.weight(1f).fillMaxWidth().testTag("deck-list").semantics { contentDescription = "Choose a deck" },
+                pageSpacing = 16.dp, key = { page -> groups[page].first().id }) { page ->
+                Row(Modifier.fillMaxSize(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                    groups[page].forEach { deck -> DeckStack(deck, { model.choose(deck) }, Modifier.weight(1f).fillMaxHeight()) }
+                    repeat(perPage - groups[page].size) { Spacer(Modifier.weight(1f)) }
+                }
             }
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 TextButton(onClick = { model.screen = Screen.HISTORY }) { Text("Recent rounds", color = p.ink) }
                 Spacer(Modifier.weight(1f))
-                DurationPicker(model, Modifier.widthIn(max = 300.dp).weight(.8f, fill = false))
+                IconButton(onClick = { scope.launch { pager.animateScrollToPage(pager.currentPage - 1) } }, enabled = pager.currentPage > 0,
+                    modifier = Modifier.testTag("previous-decks")) {
+                    Icon(Icons.AutoMirrored.Sharp.ArrowBack, contentDescription = "Previous decks", tint = if (pager.currentPage > 0) p.ink else p.muted.copy(alpha = .45f))
+                }
+                Text("${pager.currentPage + 1} / ${groups.size}", color = p.muted, modifier = Modifier.testTag("deck-page")
+                    .semantics { contentDescription = "Deck page ${pager.currentPage + 1} of ${groups.size}" })
+                IconButton(onClick = { scope.launch { pager.animateScrollToPage(pager.currentPage + 1) } }, enabled = pager.currentPage < groups.lastIndex,
+                    modifier = Modifier.testTag("next-decks")) {
+                    Icon(Icons.AutoMirrored.Sharp.ArrowForward, contentDescription = "Next decks", tint = if (pager.currentPage < groups.lastIndex) p.ink else p.muted.copy(alpha = .45f))
+                }
+                if (!separateDurationRow) {
+                    Spacer(Modifier.weight(1f))
+                    DurationPicker(model, Modifier.width(240.dp))
+                }
+            }
+            if (separateDurationRow) {
+                DurationPicker(model, Modifier.fillMaxWidth())
             }
         }
     }
@@ -158,7 +184,8 @@ class MainActivity : ComponentActivity() {
         listOf(30, 60, 90, 120).forEach { value ->
             Box(Modifier.weight(1f).background(if (model.seconds == value) p.cardFace else p.card).clickable { model.changeSeconds(value) }
                 .heightIn(min = 48.dp).padding(8.dp), contentAlignment = Alignment.Center) {
-                Text("${value}s", fontWeight = FontWeight.Bold, color = if (model.seconds == value) p.cardInk else p.ink)
+                Text("${value}s", fontWeight = FontWeight.Bold, color = if (model.seconds == value) p.cardInk else p.ink,
+                    maxLines = 1, softWrap = false, onTextLayout = {})
             }
         }
     }
@@ -174,6 +201,10 @@ class MainActivity : ComponentActivity() {
                 CategoryIcon(model.selected.id, Modifier.size(50.dp), p.ink)
                 Spacer(Modifier.height(12.dp))
                 Text("Hold at your forehead,\nfacing your friends.", fontFamily = Headline, fontSize = 25.sp, lineHeight = 32.sp, color = p.ink)
+                if (model.selected.silentActing) {
+                    Text("Clue givers: act without speaking.\nGuesser: say your answer.", color = p.muted, fontSize = 17.sp,
+                        modifier = Modifier.padding(top = 12.dp).testTag("silent-rule"))
+                }
             }
             Column(Modifier.weight(1f).fillMaxHeight().verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically)) {
                 Instruction(Icons.Sharp.KeyboardArrowDown, "Correct", p.correct, model.practicedCorrect)
@@ -239,7 +270,8 @@ private fun shortTiltStatus(model: AppModel): String = when (model.tiltStatus) {
                             color = p.correct, modifier = Modifier.testTag("countdown"))
                     }
                 }
-                Text("Hold still at your forehead", color = p.muted, modifier = Modifier.padding(vertical = 10.dp))
+                    Text(if (model.selected.silentActing) "Hold still. Clues are acted, not spoken." else "Hold still at your forehead", color = p.muted,
+                        modifier = Modifier.padding(vertical = 10.dp))
             }
         }
         Phase.PLAYING -> {

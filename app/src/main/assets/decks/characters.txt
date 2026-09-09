@@ -1,0 +1,727 @@
+# CHARACTERS
+
+# Video Games: Mario And Donkey Kong
+Mario
+Luigi
+Princess Peach
+Princess Daisy
+Bowser
+Bowser Jr.
+Yoshi (Mario)
+Toad (Mario)
+Toadette
+Rosalina
+Wario
+Waluigi
+Donkey Kong
+Diddy Kong
+Dixie Kong
+King K. Rool
+
+# Video Games: Sonic
+Sonic the Hedgehog
+Tails (Sonic)
+Knuckles the Echidna
+Amy Rose
+Shadow the Hedgehog
+Dr. Eggman
+Rouge the Bat
+Silver the Hedgehog
+
+# Video Games: The Legend Of Zelda
+Link (The Legend of Zelda)
+Princess Zelda
+Ganondorf
+Impa
+
+# Video Games: More Nintendo Adventures
+Kirby
+King Dedede
+Meta Knight
+Samus Aran
+Fox McCloud
+Captain Falcon
+Ness (EarthBound)
+Pit (Kid Icarus)
+
+# Video Games: Animal Crossing
+Isabelle (Animal Crossing)
+Tom Nook
+K.K. Slider
+Blathers
+
+# Video Games: PlayStation Platform Adventures
+Crash Bandicoot
+Coco Bandicoot
+Dr. Neo Cortex
+Spyro the Dragon
+Ratchet (Ratchet & Clank)
+Clank (Ratchet & Clank)
+Sackboy
+Sly Cooper
+Jak (Jak and Daxter)
+Daxter
+
+# Video Games: Action And Puzzle Adventures
+Lara Croft
+Nathan Drake
+Master Chief
+Cortana (Halo)
+Ezio Auditore
+Kratos (God of War)
+Aloy (Horizon)
+GLaDOS
+Chell (Portal)
+Gordon Freeman
+
+# Video Games: Role-Playing And Fighting Games
+Cloud Strife
+Tifa Lockhart
+Sephiroth
+Aerith Gainsborough
+Squall Leonhart
+Sora (Kingdom Hearts)
+Riku (Kingdom Hearts)
+Ryu (Street Fighter)
+Chun-Li
+Ken Masters
+
+# Video Games: Arcade And Other Game Favorites
+Pac-Man
+Ms. Pac-Man
+Mega Man
+Steve (Minecraft)
+Alex (Minecraft)
+Sans (Undertale)
+Papyrus (Undertale)
+Shovel Knight
+Rayman
+Jill Valentine
+
+# Cartoons And TV Animation: Pokemon
+Ash Ketchum
+Misty (Pokemon)
+Brock (Pokemon)
+Jessie (Team Rocket)
+James (Team Rocket)
+Meowth (Team Rocket)
+Ash's Pikachu
+Professor Oak
+
+# Cartoons And TV Animation: Looney Tunes
+Bugs Bunny
+Daffy Duck
+Porky Pig
+Elmer Fudd
+Yosemite Sam
+Tweety
+Sylvester the Cat
+Wile E. Coyote
+Road Runner (Looney Tunes)
+Taz (Looney Tunes)
+
+# Cartoons And TV Animation: Scooby-Doo
+Scooby-Doo
+Shaggy Rogers
+Fred Jones
+Daphne Blake
+Velma Dinkley
+
+# Cartoons And TV Animation: Hanna-Barbera Classics
+Fred Flintstone
+Wilma Flintstone
+Barney Rubble
+Betty Rubble
+George Jetson
+Jane Jetson
+Yogi Bear
+Boo-Boo Bear
+
+# Cartoons And TV Animation: Tom And Jerry
+Tom (Tom and Jerry)
+Jerry (Tom and Jerry)
+
+# Cartoons And TV Animation: Peanuts
+Charlie Brown
+Snoopy
+Woodstock (Peanuts)
+Lucy van Pelt
+
+# Cartoons And TV Animation: Garfield
+Garfield
+Odie
+Jon Arbuckle
+
+# Cartoons And TV Animation: SpongeBob SquarePants
+SpongeBob SquarePants
+Patrick Star
+Squidward Tentacles
+Sandy Cheeks
+Mr. Krabs
+Sheldon J. Plankton
+
+# Cartoons And TV Animation: The Simpsons
+Homer Simpson
+Marge Simpson
+Bart Simpson
+Lisa Simpson
+Maggie Simpson
+Ned Flanders
+Mr. Burns
+Krusty the Clown
+
+# Cartoons And TV Animation: Futurama
+Philip J. Fry
+Turanga Leela
+Bender (Futurama)
+Dr. Zoidberg
+
+# Cartoons And TV Animation: Nickelodeon Classics
+Tommy Pickles
+Chuckie Finster
+Angelica Pickles
+Arnold Shortman
+Helga Pataki
+Doug Funnie
+
+# Cartoons And TV Animation: Avatar
+Aang
+Katara
+Sokka
+Toph Beifong
+Prince Zuko
+Korra
+
+# Cartoons And TV Animation: Cartoon Network Adventures
+Finn the Human
+Jake the Dog
+Marceline
+Princess Bubblegum
+Steven Universe
+Garnet (Steven Universe)
+Gumball Watterson
+Darwin Watterson
+Ben Tennyson
+Samurai Jack
+
+# Cartoons And TV Animation: The Powerpuff Girls
+Blossom (The Powerpuff Girls)
+Bubbles (The Powerpuff Girls)
+Buttercup (The Powerpuff Girls)
+Mojo Jojo
+
+# Cartoons And TV Animation: Disney TV Adventures
+Kim Possible
+Ron Stoppable
+Phineas Flynn
+Ferb Fletcher
+Perry the Platypus
+Dr. Doofenshmirtz
+Dipper Pines
+Mabel Pines
+Scrooge McDuck
+Darkwing Duck
+
+# Cartoons And TV Animation: Mickey And Friends
+Mickey Mouse
+Minnie Mouse
+Donald Duck
+Daisy Duck
+Goofy
+Pluto (Disney)
+
+# Cartoons And TV Animation: Younger Viewers
+Bluey Heeler
+Bingo Heeler
+Peppa Pig
+George Pig
+Dora the Explorer
+Boots (Dora the Explorer)
+Bob the Builder
+Fireman Sam
+Postman Pat
+Thomas the Tank Engine
+Shaun the Sheep
+
+# Cartoons And TV Animation: Anime Adventures
+Naruto Uzumaki
+Sasuke Uchiha
+Sakura Haruno
+Goku
+Vegeta
+Sailor Moon
+Monkey D. Luffy
+Doraemon
+
+# Cartoons And TV Animation: More Cartoon Classics
+Inspector Gadget
+Danger Mouse
+Popeye
+Olive Oyl
+Betty Boop
+
+# Animated Films: Classic Disney Fairy Tales
+Snow White
+Cinderella
+Aurora (Sleeping Beauty)
+Maleficent
+Ariel (The Little Mermaid)
+Ursula (The Little Mermaid)
+Belle (Beauty and the Beast)
+Beast (Beauty and the Beast)
+Gaston
+Aladdin (Disney)
+Princess Jasmine
+Genie (Aladdin)
+Jafar
+
+# Animated Films: Newer Disney Fairy Tales And Heroes
+Mulan (Disney)
+Mushu
+Rapunzel (Tangled)
+Flynn Rider
+Tiana (The Princess and the Frog)
+Elsa (Frozen)
+Anna (Frozen)
+Olaf (Frozen)
+Kristoff (Frozen)
+Moana
+Maui (Moana)
+Mirabel Madrigal
+Bruno Madrigal
+
+# Animated Films: Disney Animal Adventures
+Simba
+Nala
+Mufasa
+Scar (The Lion King)
+Timon
+Pumbaa
+Zazu
+Bambi
+Thumper (Bambi)
+Dumbo
+Baloo (The Jungle Book)
+Lady (Lady and the Tramp)
+Tramp (Lady and the Tramp)
+Pongo (101 Dalmatians)
+Cruella de Vil
+
+# Animated Films: More Disney Adventures
+Lilo Pelekai
+Stitch (Lilo & Stitch)
+Tarzan (Disney)
+Quasimodo
+Esmeralda (The Hunchback of Notre Dame)
+Hercules (Disney)
+Hades (Hercules)
+Judy Hopps
+Nick Wilde
+Baymax
+Hiro Hamada
+
+# Animated Films: Toy Story
+Woody (Toy Story)
+Buzz Lightyear
+Jessie (Toy Story)
+Bo Peep (Toy Story)
+Rex (Toy Story)
+Slinky Dog
+Mr. Potato Head
+Lotso
+
+# Animated Films: Finding Nemo And Monsters Inc.
+Nemo (Finding Nemo)
+Dory
+Marlin (Finding Nemo)
+Mike Wazowski
+Sulley (Monsters, Inc.)
+Boo (Monsters, Inc.)
+
+# Animated Films: More Pixar Adventures
+Mr. Incredible
+Elastigirl
+Violet Parr
+Dash Parr
+Frozone
+Edna Mode
+Lightning McQueen
+Mater (Cars)
+WALL-E
+EVE (WALL-E)
+Remy (Ratatouille)
+Carl Fredricksen
+Russell (Up)
+Joy (Inside Out)
+Sadness (Inside Out)
+Miguel (Coco)
+
+# Animated Films: Shrek
+Shrek
+Donkey (Shrek)
+Princess Fiona
+Puss in Boots (Shrek)
+Lord Farquaad
+
+# Animated Films: More DreamWorks Adventures
+Po (Kung Fu Panda)
+Master Shifu
+Tigress (Kung Fu Panda)
+Hiccup (How to Train Your Dragon)
+Toothless (How to Train Your Dragon)
+Astrid (How to Train Your Dragon)
+Alex the Lion (Madagascar)
+Marty (Madagascar)
+Gloria (Madagascar)
+King Julien
+
+# Animated Films: More Animation Favorites
+Gru (Despicable Me)
+Lucy Wilde
+Bob (Despicable Me)
+Kevin (Despicable Me)
+Stuart (Despicable Me)
+Sid (Ice Age)
+Manny (Ice Age)
+Scrat
+Coraline Jones
+Jack Skellington
+Sally (The Nightmare Before Christmas)
+Gromit
+Wallace (Wallace and Gromit)
+
+# Animated Films: Studio Ghibli
+Totoro
+Chihiro Ogino
+No-Face (Spirited Away)
+Kiki (Kiki's Delivery Service)
+Howl (Howl's Moving Castle)
+
+# Books And Folklore: Harry Potter
+Harry Potter
+Hermione Granger
+Ron Weasley
+Albus Dumbledore
+Severus Snape
+Rubeus Hagrid
+Lord Voldemort
+Draco Malfoy
+Sirius Black
+Remus Lupin
+Minerva McGonagall
+Luna Lovegood
+Neville Longbottom
+Ginny Weasley
+Fred Weasley
+George Weasley
+Dobby
+Bellatrix Lestrange
+
+# Books And Folklore: The Hobbit And The Lord Of The Rings
+Frodo Baggins
+Bilbo Baggins
+Samwise Gamgee
+Gandalf
+Aragorn
+Legolas
+Gimli
+Gollum
+Sauron
+Smaug
+
+# Books And Folklore: Alice In Wonderland
+Alice (Alice in Wonderland)
+Mad Hatter
+Cheshire Cat
+White Rabbit (Alice in Wonderland)
+Queen of Hearts (Alice in Wonderland)
+March Hare
+
+# Books And Folklore: The Wizard Of Oz
+Dorothy Gale
+Scarecrow (The Wizard of Oz)
+Tin Man (The Wizard of Oz)
+Cowardly Lion
+Wicked Witch of the West
+
+# Books And Folklore: Peter Pan
+Peter Pan
+Wendy Darling
+Tinker Bell
+Captain Hook
+Mr. Smee
+
+# Books And Folklore: Winnie The Pooh
+Winnie the Pooh
+Piglet (Winnie the Pooh)
+Tigger
+Eeyore
+Christopher Robin
+
+# Books And Folklore: Roald Dahl Stories
+Willy Wonka
+Charlie Bucket
+Matilda Wormwood
+Miss Trunchbull
+The BFG
+Fantastic Mr. Fox
+
+# Books And Folklore: Fictional Detectives
+Sherlock Holmes
+Dr. John Watson
+Hercule Poirot
+Miss Marple
+
+# Books And Folklore: Children's Book Favorites
+Paddington Bear
+Peter Rabbit
+Pippi Longstocking
+Mary Poppins
+The Cat in the Hat
+The Grinch
+The Lorax
+Curious George
+
+# Books And Folklore: Fairy Tales And Adaptations
+Pinocchio
+Geppetto
+Jiminy Cricket
+Goldilocks
+Little Red Riding Hood
+Rumpelstiltskin
+Jack (Jack and the Beanstalk)
+The Little Prince
+
+# Books And Folklore: Fantasy And Adventure Novels
+Percy Jackson
+Annabeth Chase
+Aslan
+Lucy Pevensie
+Katniss Everdeen
+Peeta Mellark
+Huckleberry Finn
+Tom Sawyer
+
+# Books And Folklore: Literary Classics
+Ebenezer Scrooge
+Oliver Twist
+Fagin
+Elizabeth Bennet
+Mr. Darcy
+Count Dracula
+Frankenstein's Monster
+Dr. Jekyll
+
+# Books And Folklore: Legends
+Robin Hood
+Maid Marian
+King Arthur
+Merlin
+
+# Comics And Superheroes: Marvel
+Spider-Man (Peter Parker)
+Iron Man
+Captain America (Steve Rogers)
+Thor (Marvel)
+Hulk (Bruce Banner)
+Black Widow (Natasha Romanoff)
+Hawkeye (Clint Barton)
+Black Panther (T'Challa)
+Doctor Strange
+Scarlet Witch
+Vision (Marvel)
+Ant-Man (Scott Lang)
+Star-Lord
+Gamora
+Groot
+Rocket Raccoon
+Loki (Marvel)
+Thanos
+Wolverine (Marvel)
+Storm (X-Men)
+Magneto
+Captain Marvel (Carol Danvers)
+Miles Morales
+
+# Comics And Superheroes: DC
+Superman
+Batman
+Wonder Woman
+Aquaman
+The Flash (Barry Allen)
+Green Lantern (Hal Jordan)
+Cyborg (DC)
+Supergirl
+Batgirl (Barbara Gordon)
+Robin (Dick Grayson)
+Joker (Batman)
+Harley Quinn
+Catwoman
+The Penguin (Batman)
+The Riddler (Batman)
+Poison Ivy (Batman)
+Lex Luthor
+Lois Lane
+Shazam (Billy Batson)
+
+# Comics And Superheroes: European Comic Adventures
+Tintin
+Captain Haddock
+Asterix
+Obelix
+Lucky Luke
+
+# Comics And Superheroes: Teenage Mutant Ninja Turtles
+Leonardo (Ninja Turtles)
+Donatello (Ninja Turtles)
+Raphael (Ninja Turtles)
+Michelangelo (Ninja Turtles)
+Splinter (Ninja Turtles)
+Shredder (Ninja Turtles)
+
+# Comics And Superheroes: Transformers
+Optimus Prime
+Bumblebee (Transformers)
+Megatron
+Starscream
+Soundwave (Transformers)
+
+# Live-Action Films: Star Wars
+Luke Skywalker
+Princess Leia
+Han Solo
+Chewbacca
+Darth Vader
+Yoda
+Obi-Wan Kenobi
+R2-D2
+C-3PO
+Emperor Palpatine
+Boba Fett
+Jabba the Hutt
+Rey (Star Wars)
+Finn (Star Wars)
+Kylo Ren
+Padme Amidala
+Mace Windu
+Darth Maul
+
+# Live-Action Films: Adventure Classics
+Indiana Jones
+Marion Ravenwood
+Marty McFly
+Doc Brown (Back to the Future)
+Captain Jack Sparrow
+Will Turner
+Elizabeth Swann
+Hector Barbossa
+Rick O'Connell
+Evelyn O'Connell
+
+# Live-Action Films: Action And Science Fiction
+James Bond
+Q (James Bond)
+Miss Moneypenny
+Ethan Hunt
+Neo (The Matrix)
+Trinity (The Matrix)
+Morpheus (The Matrix)
+Rocky Balboa
+Ellen Ripley
+Sarah Connor
+
+# Live-Action Films: Family Adventures And Fantasy
+Kevin McCallister
+E.T. (The Extra-Terrestrial)
+Elliott (E.T.)
+Alan Grant
+Ellie Sattler
+John Hammond (Jurassic Park)
+Peter Venkman
+Egon Spengler
+Slimer (Ghostbusters)
+Beetlejuice
+
+# Live-Action Films: Comedy And Fantasy
+Buddy (Elf)
+Edward Scissorhands
+Ferris Bueller
+Ace Ventura
+Austin Powers
+Elle Woods
+Mrs. Doubtfire
+The Mask (Stanley Ipkiss)
+
+# Live-Action TV: Star Trek
+Captain Kirk
+Spock
+Jean-Luc Picard
+Data (Star Trek)
+Worf
+Seven of Nine
+Kathryn Janeway
+Uhura
+
+# Live-Action TV: Doctor Who
+The Doctor (Doctor Who)
+Rose Tyler
+River Song
+
+# Live-Action TV: Star Wars
+Din Djarin (The Mandalorian)
+Grogu
+
+# Live-Action TV: Stranger Things
+Eleven (Stranger Things)
+Dustin Henderson
+Jim Hopper
+Steve Harrington
+
+# Live-Action TV: The Addams Family
+Wednesday Addams
+Morticia Addams
+Gomez Addams
+Uncle Fester
+
+# Live-Action TV: The Muppets
+Kermit the Frog
+Miss Piggy
+Fozzie Bear
+Gonzo (The Muppets)
+Animal (The Muppets)
+Swedish Chef
+Rowlf the Dog
+
+# Live-Action TV: Sesame Street
+Big Bird
+Elmo
+Cookie Monster
+Oscar the Grouch
+Count von Count
+
+# Live-Action TV: Classic TV Heroes
+Mr. Bean
+Zorro
+The Lone Ranger
+MacGyver
+
+# Live-Action TV: Friends
+Rachel Green
+Monica Geller
+Phoebe Buffay
+Joey Tribbiani
+Chandler Bing
+Ross Geller
+
+# Live-Action TV: The Office
+Michael Scott
+Dwight Schrute
+Jim Halpert
+
+# Live-Action TV: More Sitcom Favorites
+Sheldon Cooper
+Leonard Hofstadter
+Leslie Knope
+Ron Swanson
+Ted Lasso
+Rebecca Welton

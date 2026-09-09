@@ -1,0 +1,585 @@
+# FOOD & DRINK
+
+# Fruits And Dried Fruit
+Apple
+Orange
+Lemon
+Lime
+Peach
+Pear
+Plum
+Apricot
+Nectarine
+Cherry
+Banana
+Pineapple
+Mango
+Papaya
+Avocado
+Coconut
+Pomegranate
+Fig
+Date
+Strawberry
+Raspberry
+Blueberry
+Blackberry
+Cranberry
+Grape
+Watermelon
+Cantaloupe
+Honeydew Melon
+Grapefruit
+Tangerine
+Kiwifruit
+Passion Fruit
+Guava
+Lychee
+Dragon Fruit
+Persimmon
+Raisin
+Prune
+Jackfruit
+Gooseberry
+
+# Vegetables And Edible Fungi
+Potato
+Sweet Potato
+Carrot
+Onion
+Garlic
+Ginger
+Tomato
+Cucumber
+Lettuce
+Spinach
+Kale
+Cabbage
+Broccoli
+Cauliflower
+Brussels Sprouts
+Celery
+Leek
+Asparagus
+Artichoke
+Bell Pepper
+Chili Pepper
+Zucchini
+Eggplant
+Pumpkin
+Butternut Squash
+Beetroot
+Radish
+Turnip
+Parsnip
+Rutabaga
+Corn
+Peas
+Green Bean
+Mushroom
+Truffle
+Watercress
+Seaweed
+Bamboo Shoots
+Bean Sprouts
+Bok Choy
+Okra
+Fennel Bulb
+Rhubarb
+Spring Onion
+Shallot
+
+# Grains, Beans, Nuts, And Seeds
+Rice
+Wheat
+Oats
+Barley
+Rye
+Quinoa
+Couscous
+Bulgur
+Buckwheat
+Millet
+Chickpea
+Lentil
+Kidney Bean
+Black Bean
+Cannellini Bean
+Pinto Bean
+Broad Bean
+Lima Bean
+Edamame
+Split Peas
+Peanut
+Almond
+Walnut
+Cashew
+Pistachio
+Hazelnut
+Pecan
+Brazil Nut
+Macadamia
+Chestnut
+Pine Nut
+Sesame Seeds
+Sunflower Seeds
+Pumpkin Seeds
+Chia Seeds
+Flaxseed
+Cornmeal
+Semolina
+Tapioca
+Rice Noodles
+
+# Herbs And Spices
+Salt
+Black Pepper
+Cinnamon
+Mint
+Basil
+Rosemary
+Parsley
+Cilantro
+Thyme
+Oregano
+Sage
+Dill
+Bay Leaf
+Paprika
+Cumin
+Turmeric
+Nutmeg
+Clove
+Cardamom
+Saffron
+Star Anise
+Cayenne Pepper
+Allspice
+Coriander Seeds
+Mustard Seeds
+Vanilla Pod
+Lemongrass
+Curry Powder
+Chives
+Fenugreek
+
+# Pantry And Baking Ingredients
+Flour
+Sugar
+Baking Soda
+Baking Powder
+Cornstarch
+Yeast
+Cooking Oil
+Vinegar
+Honey
+Maple Syrup
+Breadcrumbs
+Gelatin
+Vanilla Extract
+Cocoa Powder
+Food Coloring
+Chocolate Chips
+Molasses
+Puff Pastry
+Filo Pastry
+Marzipan
+Fondant
+Lard
+Sugarcane
+Cocoa Bean
+Coffee Bean
+
+# Sauces, Spreads, And Pickles
+Soy Sauce
+Ketchup
+Mustard
+Mayonnaise
+Hot Sauce
+Barbecue Sauce
+Pesto
+Salad Dressing
+Curry Paste
+Gravy
+Hummus
+Salsa
+Jam
+Peanut Butter
+Marmalade
+Chutney
+Guacamole
+Tahini
+Tzatziki
+Aioli
+Hollandaise Sauce
+Bechamel Sauce
+Tartar Sauce
+Worcestershire Sauce
+Fish Sauce
+Oyster Sauce
+Hoisin Sauce
+Teriyaki Sauce
+Sweet Chili Sauce
+Sriracha
+Gochujang
+Miso
+Wasabi
+Horseradish
+Pickle
+Sauerkraut
+Kimchi
+Capers
+Olive
+Relish
+
+# Dairy And Eggs
+Butter
+Cream Cheese
+Sour Cream
+Yogurt
+Cheddar
+Mozzarella
+Parmesan
+Brie
+Camembert
+Gouda
+Feta
+Blue Cheese
+Ricotta
+Cottage Cheese
+Halloumi
+Paneer
+Mascarpone
+Goat Cheese
+Whipped Cream
+Buttermilk
+Condensed Milk
+Evaporated Milk
+Kefir
+Egg
+Ghee
+
+# Meat And Seafood
+Beef
+Pork
+Lamb
+Chicken
+Turkey
+Duck
+Goose
+Bacon
+Ham
+Sausage
+Salami
+Pepperoni
+Chorizo
+Prosciutto
+Pancetta
+Steak
+Pork Chop
+Ribs
+Minced Beef
+Liver
+Venison
+Salmon
+Tuna
+Cod
+Trout
+Sardine
+Anchovy
+Mackerel
+Haddock
+Shrimp
+Crab
+Lobster
+Oyster
+Mussel
+Clam
+Scallop
+Squid
+Octopus
+Caviar
+Crayfish
+
+# Breakfast And Breads
+Pancake
+Waffle
+Omelet
+Scrambled Eggs
+Hash Browns
+Porridge
+Granola
+Muesli
+Cornflakes
+French Toast
+Eggs Benedict
+Poached Egg
+Boiled Egg
+Shakshuka
+Baked Beans
+Toast
+Bagel
+Croissant
+Pita Bread
+Tortilla
+Baguette
+Sourdough Bread
+Rye Bread
+Brioche
+Ciabatta
+Focaccia
+Naan
+Chapati
+Paratha
+Pumpernickel
+Cornbread
+Soda Bread
+English Muffin
+Crumpet
+Scone
+Buttermilk Biscuit
+Breadstick
+Garlic Bread
+Hot Cross Bun
+Banana Bread
+
+# Sandwiches And Savory Snacks
+Sandwich
+Burger
+Hot Dog
+Grilled Cheese
+BLT
+Club Sandwich
+Reuben Sandwich
+Banh Mi
+Falafel
+Pretzel
+Cracker
+Popcorn
+Potato Chips
+Tortilla Chips
+Nachos
+Onion Rings
+Mozzarella Sticks
+Chicken Nuggets
+Sausage Roll
+Scotch Egg
+Pork Pie
+Trail Mix
+Beef Jerky
+Rice Cake
+Corn Dog
+Samosa
+Spring Roll
+Pakora
+Empanada
+Prawn Cocktail
+
+# Pasta, Pizza, And Comfort Food
+Pizza
+Calzone
+Lasagna
+Ravioli
+Spaghetti
+Macaroni And Cheese
+Gnocchi
+Tortellini
+Cannelloni
+Penne
+Fettuccine
+Carbonara
+Bolognese
+Meatball
+Stew
+Mashed Potatoes
+French Fries
+Baked Potato
+Roast Chicken
+Fried Chicken
+Fish And Chips
+Shepherd's Pie
+Meatloaf
+Chicken Pot Pie
+Beef Stroganoff
+
+# International Meals
+Taco
+Burrito
+Quesadilla
+Enchilada
+Fajitas
+Tamale
+Chili Con Carne
+Jambalaya
+Gumbo
+Paella
+Risotto
+Ratatouille
+Moussaka
+Pierogi
+Goulash
+Schnitzel
+Kebab
+Shawarma
+Curry
+Biryani
+Butter Chicken
+Tandoori Chicken
+Dosa
+Satay
+Pad Thai
+Fried Rice
+Ramen
+Dumpling
+Sushi
+Tempura
+Peking Duck
+Bibimbap
+
+# Soups And Salads
+Pho
+Tom Yum Soup
+Miso Soup
+Minestrone
+French Onion Soup
+Gazpacho
+Clam Chowder
+Tomato Soup
+Caesar Salad
+Greek Salad
+Coleslaw
+Tabbouleh
+Potato Salad
+
+# Cakes, Pies, And Pastries
+Cheesecake
+Cupcake
+Cookie
+Brownie
+Doughnut
+Muffin
+Eclair
+Apple Pie
+Cinnamon Roll
+Gingerbread
+Baklava
+Churro
+Macaron
+Sponge Cake
+Carrot Cake
+Red Velvet Cake
+Fruitcake
+Pineapple Upside-Down Cake
+Swiss Roll
+Black Forest Cake
+Chocolate Cake
+Pecan Pie
+Pumpkin Pie
+Key Lime Pie
+Lemon Meringue Pie
+Profiterole
+Strudel
+Danish Pastry
+Cannoli
+Bakewell Tart
+
+# Puddings, Candy, And Frozen Desserts
+Custard
+Pudding
+Ice Cream
+Sorbet
+Ice Pop
+Fudge
+Caramel
+Marshmallow
+Cotton Candy
+Lollipop
+Jelly Bean
+Chocolate Bar
+Chewing Gum
+Tiramisu
+Panna Cotta
+Creme Brulee
+Bread Pudding
+Rice Pudding
+Sticky Toffee Pudding
+Trifle
+Chocolate Mousse
+Pavlova
+Meringue
+Mochi
+Kulfi
+Banana Split
+Sundae
+Peanut Brittle
+Toffee
+Turkish Delight
+
+# Nonalcoholic Drinks
+Bottled Water
+Milk
+Orange Juice
+Lemonade
+Hot Chocolate
+Coffee
+Tea
+Milkshake
+Smoothie
+Soda
+Energy Drink
+Eggnog
+Sparkling Water
+Apple Juice
+Tomato Juice
+Cranberry Juice
+Pineapple Juice
+Grape Juice
+Coconut Water
+Oat Milk
+Soy Milk
+Almond Milk
+Lassi
+Iced Tea
+Green Tea
+Chai
+Matcha
+Chamomile Tea
+Espresso
+Cappuccino
+Latte
+Americano
+Flat White
+Mocha
+Iced Coffee
+Cold Brew
+Bubble Tea
+Kombucha
+Ginger Beer
+Root Beer
+Tonic Water
+
+# Alcoholic Drinks
+Beer
+Wine
+Cider
+Whiskey
+Rum
+Vodka
+Gin
+Tequila
+Brandy
+Sake
+Mead
+Champagne
+Prosecco
+Port
+Sherry
+Martini
+Margarita
+Mojito
+Daiquiri
+Sangria
+Pina Colada
+Bloody Mary
+Irish Coffee
+Gin And Tonic

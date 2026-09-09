@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -29,9 +30,9 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 /**
- * Renders the real AutoWord; its visibility must be made internal by the parent change.
- * The 12 longest entries per deck give 36 distinct words and 108 size/scale cases.
- * This bounded regression sample is not an exhaustive proof for all 1,844 entries.
+ * Renders the real AutoWord: 12 longest entries from each of six decks, at three
+ * size/font scales (216 cases). Shared titles retain their separate deck samples.
+ * This is not an exhaustive proof for all 2,933 identities / 3,508 deck entries.
  */
 @RunWith(AndroidJUnit4::class)
 class CardLayoutTest {
@@ -39,16 +40,20 @@ class CardLayoutTest {
     val compose = createComposeRule()
 
     private data class CardSize(val width: Int, val height: Int, val fontScale: Float)
-    private data class Card(val word: String, val size: CardSize)
+    private data class Sample(val deckId: String, val word: String)
+    private data class Card(val sample: Sample, val size: CardSize) {
+        val word get() = sample.word
+    }
     private data class Shown(val card: Card, val word: String)
 
     private var currentCard by mutableStateOf<Card?>(null)
     // Only touched on the UI thread; recording a layout must not trigger recomposition.
     private val shown = mutableListOf<Shown>()
 
-    private val sampledWords: List<String> by lazy {
+    private val samples: List<Sample> by lazy {
         val assets = InstrumentationRegistry.getInstrumentation().targetContext.assets
-        val decks = listOf("wild-world", "everyday", "do-your-thing").map { id ->
+        val ids = listOf("wild-world", "everyday", "do-your-thing", "characters", "silent-acting", "food-drink")
+        val decks = ids.associateWith { id ->
             assets.open("decks/$id.txt").bufferedReader().useLines { lines ->
                 lines.map { it.trim() }
                     .filter { it.isNotEmpty() && !it.startsWith("#") }
@@ -57,10 +62,16 @@ class CardLayoutTest {
                 assertTrue("Deck $id must contain at least 12 entries", words.size >= 12)
             }
         }
-        assertEquals("Sample must be selected from the complete bundled catalog", 1844, decks.sumOf { it.size })
-        decks.flatMap { words ->
-            words.sortedWith(compareByDescending<String> { it.length }.thenBy { it }).take(12)
-        }.distinctBy { it.uppercase() }
+        assertEquals("Sample must be selected from the complete bundled catalog", 3508, decks.values.sumOf { it.size })
+        decks.flatMap { (id, words) ->
+            words.sortedWith(compareByDescending<String> { it.length }.thenBy { it }).take(12).map { Sample(id, it) }
+        }.also { selected ->
+            assertEquals("Every deck must contribute twelve longest entries", 72, selected.size)
+            assertEquals(ids.toSet(), selected.map { it.deckId }.toSet())
+            selected.groupBy { it.deckId }.forEach { (id, entries) ->
+                assertEquals("Twelve separate samples for $id", 12, entries.distinct().size)
+            }
+        }
     }
 
     @Before
@@ -73,7 +84,9 @@ class CardLayoutTest {
                 if (card != null) {
                     CompositionLocalProvider(LocalDensity provides Density(1f, card.size.fontScale)) {
                         Box(Modifier.size(card.size.width.dp, card.size.height.dp).testTag("card-container")) {
-                            AutoWord(card.word) { word -> shown += Shown(card, word) }
+                            key(card.sample) {
+                                AutoWord(card.word) { word -> shown += Shown(card, word) }
+                            }
                         }
                     }
                 }
@@ -98,9 +111,9 @@ class CardLayoutTest {
 
     @Test
     fun onShownIsWithheldForOverflowAndDeliveredOnceTheSameWordFits() {
-        val word = sampledWords.maxBy { it.length }
+        val sample = samples.maxBy { it.word.length }
         // A single pixel cannot fit even AutoWord's minimum 6sp text size.
-        val tooSmall = Card(word, CardSize(width = 1, height = 1, fontScale = 2f))
+        val tooSmall = Card(sample, CardSize(width = 1, height = 1, fontScale = 2f))
         render(tooSmall)
         assertTrue("The negative control must genuinely overflow", readLayout(tooSmall).hasVisualOverflow)
         compose.runOnIdle {
@@ -108,11 +121,11 @@ class CardLayoutTest {
         }
 
         // Keep the same composable/word: changing constraints must invalidate its fitted style.
-        assertFits(Card(word, CardSize(width = 508, height = 80, fontScale = 2f)))
+        assertFits(Card(sample, CardSize(width = 508, height = 80, fontScale = 2f)))
     }
 
     private fun assertSampleFits(size: CardSize) {
-        sampledWords.forEach { word -> assertFits(Card(word, size)) }
+        samples.forEach { sample -> assertFits(Card(sample, size)) }
     }
 
     private fun render(card: Card) {

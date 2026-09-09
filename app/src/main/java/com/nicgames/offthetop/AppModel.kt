@@ -20,7 +20,7 @@ import org.json.JSONArray
 import org.json.JSONObject
 import kotlin.math.ceil
 
-data class Deck(val id: String, val title: String, val subtitle: String, val examples: String, val words: List<String>)
+data class Deck(val id: String, val title: String, val subtitle: String, val examples: String, val words: List<String>, val silentActing: Boolean = false)
 data class RoundRecord(val id: Long, val deck: String, val seconds: Int, val answers: List<Answer>) {
     val score get() = answers.count { it.outcome == Outcome.CORRECT }
 }
@@ -28,11 +28,16 @@ enum class Screen { HOME, PRACTICE, ROUND, SETTINGS, HELP, HISTORY }
 
 class AppModel(application: Application) : AndroidViewModel(application) {
     private val prefs = application.getSharedPreferences("off-the-top", Context.MODE_PRIVATE)
+    private val seenCards = SeenCards(prefs)
     val decks = listOf(
         deck("wild-world", "Wild World", "ANIMALS, EARTH & SKY", "Elephant · Rainbow · Venus Flytrap"),
         deck("everyday", "Everyday Things", "OBJECTS, FOOD & MORE", "Waffle · Wheelbarrow · Saxophone"),
         deck("do-your-thing", "Do Your Thing", "ACTIONS, JOBS & PLACES", "Missing the Bus · Pilot · Bowling"),
+        deck("characters", "Characters", "FICTIONAL CHARACTERS", "Mario · Darth Vader · Ash Ketchum"),
+        deck("silent-acting", "Silent Acting", "ACT WITHOUT SPEAKING", "Tying Shoelaces · Beekeeper · Juggling", silentActing = true),
+        deck("food-drink", "Food & Drink", "FOOD & DRINK", "Guacamole · Dumpling · Lemonade"),
     )
+    var deckPage by mutableIntStateOf(0)
     var screen by mutableStateOf(Screen.HOME)
     var selected by mutableStateOf(decks.first())
     var seconds by mutableIntStateOf(prefs.getInt("seconds", 60).takeIf { it in listOf(30, 60, 90, 120) } ?: 60)
@@ -60,12 +65,12 @@ class AppModel(application: Application) : AndroidViewModel(application) {
     private var tone: ToneGenerator? = null
     private val vibrator = application.getSystemService(Vibrator::class.java)
 
-    private fun deck(id: String, title: String, subtitle: String, examples: String): Deck {
+    private fun deck(id: String, title: String, subtitle: String, examples: String, silentActing: Boolean = false): Deck {
         val words = getApplication<Application>().assets.open("decks/$id.txt").bufferedReader().useLines { lines ->
             lines.map { it.trim() }.filter { it.isNotEmpty() && !it.startsWith("#") }.toList()
         }
         require(words.size >= 500 && words.map { it.lowercase() }.distinct().size == words.size)
-        return Deck(id, title, subtitle, examples, words)
+        return Deck(id, title, subtitle, examples, words, silentActing)
     }
 
     fun changeSeconds(value: Int) { require(value in listOf(30, 60, 90, 120)); seconds = value; prefs.edit().putInt("seconds", value).apply() }
@@ -84,10 +89,9 @@ class AppModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun start() {
-        val seen = prefs.getStringSet("seen-${selected.id}", emptySet()).orEmpty()
-        var available = selected.words.filterNot { it in seen }
+        var available = seenCards.unseen(selected.words)
         if (available.isEmpty()) {
-            prefs.edit().remove("seen-${selected.id}").apply()
+            seenCards.restart(selected.words)
             available = selected.words
         }
         round = RoundEngine(available.shuffled(), seconds)
@@ -114,8 +118,8 @@ class AppModel(application: Application) : AndroidViewModel(application) {
     fun finish() { round?.finish(now()); refresh() }
     fun review(index: Int) { round?.correctAnswer(index); saveRound(); revision++ }
     fun home() { screen = Screen.HOME }
-    fun unseen(deck: Deck): Int = deck.words.count { it !in prefs.getStringSet("seen-${deck.id}", emptySet()).orEmpty() }
-    fun resetSeen() { prefs.edit().apply { decks.forEach { remove("seen-${it.id}") } }.apply(); revision++ }
+    fun unseen(deck: Deck): Int = seenCards.unseen(deck.words).size
+    fun resetSeen() { seenCards.reset(); revision++ }
 
     // Called after the actual word has a fitting text layout, not merely after a timer tick.
     fun revealWord(word: String) {
@@ -123,9 +127,7 @@ class AppModel(application: Application) : AndroidViewModel(application) {
         if (r.phase != Phase.PLAYING || r.feedback != null || r.currentWord != word) return
         displayedWord = word
         if (shownThisRound.add(word)) {
-            val seen = prefs.getStringSet("seen-${selected.id}", emptySet()).orEmpty().toMutableSet()
-            seen += word
-            prefs.edit().putStringSet("seen-${selected.id}", seen).apply()
+            seenCards.remember(word)
         }
     }
 

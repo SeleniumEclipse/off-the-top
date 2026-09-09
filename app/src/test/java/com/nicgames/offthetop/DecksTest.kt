@@ -1,11 +1,18 @@
 package com.nicgames.offthetop
 
 import java.io.File
+import java.util.Locale
 import org.junit.Assert.*
 import org.junit.Test
 
 class DecksTest {
     private data class Entry(val file: String, val line: Int, val word: String)
+    private val expectedSizes = mapOf(
+        "wild-world" to 622, "everyday" to 617, "do-your-thing" to 605,
+        "characters" to 580, "silent-acting" to 534, "food-drink" to 550,
+    )
+    private val originalIds = setOf("wild-world", "everyday", "do-your-thing")
+    private fun identity(word: String) = word.trim().lowercase(Locale.ROOT)
 
     // Android Gradle runs local unit tests from the app module, not the repository root.
     private fun deckFiles(): List<File> {
@@ -13,7 +20,8 @@ class DecksTest {
         assertTrue("Missing bundled decks: ${directory.absolutePath}", directory.isDirectory)
         val files = directory.listFiles()?.filter { it.isFile && it.extension.equals("txt", true) }
             ?.sortedBy { it.name }.orEmpty()
-        assertEquals("The offline game must bundle exactly three text decks", 3, files.size)
+        assertEquals("The offline game must bundle exactly six text decks", 6, files.size)
+        assertEquals("No missing or substitute decks", expectedSizes.keys, files.map { it.nameWithoutExtension }.toSet())
         return files
     }
 
@@ -24,17 +32,18 @@ class DecksTest {
         }
 
     private fun duplicates(entries: List<Entry>): String = entries
-        .groupBy { it.word.lowercase() }
+        .groupBy { identity(it.word) }
         .filterValues { it.size > 1 }
         .entries.joinToString("\n") { (word, copies) ->
             "$word: ${copies.joinToString { "${it.file}:${it.line}" }}"
         }
 
-    @Test fun bundlesExactlyThreeTextDecksWithAtLeast500PlayableEntriesEach() {
+    @Test fun bundlesExactlySixTextDecksWithAtLeast500PlayableEntriesEach() {
         for (file in deckFiles()) {
             val count = entries(file).size
             println("${file.name}: $count playable entries")
             assertTrue("${file.name} has $count entries; at least 500 required", count >= 500)
+            assertEquals("Approved entry count for ${file.name}", expectedSizes.getValue(file.nameWithoutExtension), count)
         }
     }
 
@@ -45,9 +54,47 @@ class DecksTest {
         }
     }
 
-    @Test fun noCaseInsensitiveDuplicateEntriesAcrossAnyDecks() {
-        val duplicates = duplicates(deckFiles().flatMap(::entries))
-        assertTrue("Shared or repeated words across bundled decks:\n$duplicates", duplicates.isEmpty())
+    @Test fun onlyTheThreeApprovedSharedPairsOverlap_withExactCountsAndOriginalSpelling() {
+        val decks = deckFiles().associate { it.nameWithoutExtension to entries(it).map { entry -> entry.word } }
+        val allowed = mapOf(
+            setOf("silent-acting", "do-your-thing") to 394,
+            setOf("food-drink", "everyday") to 115,
+            setOf("food-drink", "wild-world") to 66,
+        )
+        val ids = decks.keys.toList()
+        ids.forEachIndexed { index, left ->
+            ids.drop(index + 1).forEach { right ->
+                val shared = decks.getValue(left).map(::identity).toSet()
+                    .intersect(decks.getValue(right).map(::identity).toSet())
+                assertEquals("Unexpected shared cards: $left / $right: $shared",
+                    allowed[setOf(left, right)] ?: 0, shared.size)
+                assertEquals("Approved reuse must retain the exact original titles: $left / $right",
+                    shared.size, decks.getValue(left).toSet().intersect(decks.getValue(right).toSet()).size)
+            }
+        }
+    }
+
+    @Test fun originalThreeDecksRemainMutuallyDistinct() {
+        val originals = deckFiles().filter { it.nameWithoutExtension in originalIds }.flatMap(::entries)
+        assertEquals("Original catalog size must not change", 1844, originals.size)
+        assertTrue("Original decks must remain distinct:\n${duplicates(originals)}", duplicates(originals).isEmpty())
+    }
+
+    @Test fun charactersShareNoTitlesWithAnyOtherDeck() {
+        val files = deckFiles()
+        val characters = entries(files.single { it.nameWithoutExtension == "characters" }).map { identity(it.word) }.toSet()
+        val others = files.filterNot { it.nameWithoutExtension == "characters" }.flatMap(::entries).map { identity(it.word) }.toSet()
+        assertTrue("Characters must be wholly new: ${characters.intersect(others)}", characters.intersect(others).isEmpty())
+    }
+
+    @Test fun expansionAdds1089UniqueCardsAcross3508EntriesAnd2933Identities() {
+        val files = deckFiles()
+        val all = files.flatMap(::entries)
+        val originals = files.filter { it.nameWithoutExtension in originalIds }.flatMap(::entries).map { identity(it.word) }.toSet()
+        val expansion = files.filterNot { it.nameWithoutExtension in originalIds }.flatMap(::entries).map { identity(it.word) }.toSet()
+        assertEquals("All deck entries, including intentional reuse", 3508, all.size)
+        assertEquals("Total distinct playable titles", 2933, all.map { identity(it.word) }.toSet().size)
+        assertEquals("Genuinely new titles, not reused original cards", 1089, (expansion - originals).size)
     }
 
     @Test fun deckEntriesAreCleanUtf8SingleLineCardsNotCommentsOrControlCharacters() {

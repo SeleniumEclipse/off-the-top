@@ -1,13 +1,14 @@
 param(
     [string]$Adb = "$env:LOCALAPPDATA/Android/Sdk/platform-tools/adb.exe",
-    [string]$Package = 'com.nicgames.offthetop'
+    [string]$Package = 'com.nicgames.offthetop',
+    [string]$Serial = $env:ANDROID_SERIAL
 )
 $ErrorActionPreference = 'Stop'
 [Console]::OutputEncoding = [System.Text.UTF8Encoding]::new()
 $OutputEncoding = [Console]::OutputEncoding
-# Pin every command to the single running emulator, never a connected phone.
-$serial = & $Adb -e get-serialno
-if ($LASTEXITCODE -or "$serial" -notmatch '^emulator-\d+$') { throw 'Exactly one running Android emulator is required' }
+# Pin every command to the requested emulator, never every connected test device.
+$serial = if ($Serial) { & $Adb -s $Serial get-serialno } else { & $Adb -e get-serialno }
+if ($LASTEXITCODE -or "$serial" -notmatch '^emulator-\d+$') { throw 'Select a running emulator with -Serial, or leave exactly one emulator connected' }
 $device = @('-s', "$serial")
 $root = Split-Path $PSScriptRoot
 $shots = Join-Path $root 'screenshots'
@@ -192,3 +193,48 @@ foreach ($direction in @(1, -1)) {
     Require-Text '1 passed · 1 unanswered'
     Write-Output "PASS: 22-degree forehead hold, modest down/up nods, landscape direction $direction"
 }
+
+# Expansion page: real packaged assets, original icons, acting rule and saved results.
+Tap-Text 'Change deck'
+Tap-Description 'Next decks'
+Require-Description 'Choose Characters, 580 cards'
+Require-Description 'Choose Silent Acting, 534 cards'
+Require-Description 'Choose Food & Drink, 550 cards'
+Capture 'decks-new'
+foreach ($entry in @(
+    @{ Title = 'Characters'; Count = 580; Shot = 'characters' },
+    @{ Title = 'Silent Acting'; Count = 534; Shot = 'silent-acting' },
+    @{ Title = 'Food & Drink'; Count = 550; Shot = 'food-drink' }
+)) {
+    Tap-Description "Choose $($entry.Title), $($entry.Count) cards"
+    Require-Text $entry.Title
+    if ($entry.Title -eq 'Silent Acting') {
+        Require-Text "Clue givers: act without speaking.`nGuesser: say your answer."
+        Capture 'silent-acting-rules'
+    }
+    Set-Tilt 0
+    Tap-Text 'Start round'
+    $watch = [Diagnostics.Stopwatch]::StartNew()
+    do {
+        $ui = Read-Ui
+        $playing = @($ui.SelectNodes('//node') | Where-Object { $_.'content-desc' -eq '0 correct' }).Count -gt 0
+        if ($watch.Elapsed.TotalSeconds -gt 15) { throw "New deck failed to start: $($entry.Title)" }
+    } until ($playing)
+    Capture "$($entry.Shot)-playing"
+    Tap-Text 'Correct'
+    Require-Description '1 correct'
+    Tap-Text 'Pause'
+    Tap-Text 'End & review'
+    Require-Text 'Results'
+    Tap-Text 'Change deck'
+    Require-Description "Choose $($entry.Title), $($entry.Count) cards"
+    Write-Output "PASS: $($entry.Title) packaged deck, live scoring, review and remembered picker page"
+}
+
+& $Adb @device shell am force-stop $Package
+& $Adb @device shell am start -W -n "$Package/com.nicgames.offthetop.MainActivity"
+Tap-Text 'Recent rounds'
+foreach ($title in @('Characters', 'Silent Acting', 'Food & Drink')) { Require-Text $title }
+Capture 'expansion-history'
+Tap-Text 'Back'
+Write-Output 'PASS: all three new decks retain completed rounds after process restart'

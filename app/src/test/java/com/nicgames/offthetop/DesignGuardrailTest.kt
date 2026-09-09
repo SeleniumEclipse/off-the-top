@@ -51,7 +51,7 @@ class DesignGuardrailTest {
             val decoded = unicodeEscape.replace(file.readText()) {
                 it.groupValues[1].toInt(16).toChar().toString()
             }
-            assertFalse("${file.name}: use Sharp action vectors or the three approved category vectors, not glyphs/suits",
+            assertFalse("${file.name}: use Sharp action vectors or the six approved category vectors, not glyphs/suits",
                 icons.containsMatchIn(decoded))
         }
     }
@@ -95,7 +95,8 @@ class DesignGuardrailTest {
                 assertTrue("CategoryIcon must paint its selected bundled vector",
                     Regex("""\bIcon\s*\(\s*painterResource\s*\(\s*asset\s*\)""").containsMatchIn(category))
                 val mappings = mapOf("wild-world" to "category_wild", "everyday" to "category_everyday",
-                    "do-your-thing" to "category_actions")
+                    "do-your-thing" to "category_actions", "characters" to "category_characters",
+                    "silent-acting" to "category_silent", "food-drink" to "category_food")
                 mappings.forEach { (id, asset) ->
                     assertTrue("$id must select $asset",
                         Regex("\"$id\"\\s*->\\s*R\\.drawable\\.$asset\\b").containsMatchIn(category))
@@ -119,7 +120,7 @@ class DesignGuardrailTest {
     }
 
     @Test
-    fun categoryResourcesRetainTheOriginalLeafMugAndMotionArtwork() {
+    fun categoryResourcesRetainAllSixApprovedOriginalDrawings() {
         // Frozen equivalents of design/icons/{wild-world,everyday-things,do-your-thing}.svg.
         // SVG implicit lines/relative moves and its circle are expanded for Android.
         // Together with rendered pixel checks, this rejects blank/replaced/suit artwork.
@@ -127,9 +128,12 @@ class DesignGuardrailTest {
             "category_wild" to "M10,32C7,15 19,7 38,7c1,19 -7,31 -22,28M8,40L31,17M17,31V22m0,9h10M24,24v-8m0,8h8",
             "category_everyday" to "M8,16h24v18a5,5 0,0 1,-5 5H13a5,5 0,0 1,-5 -5V16ZM32,19h4a6,6 0,0 1,0 12h-4M6,43h32M15,6v5m10,-5v5",
             "category_actions" to "M26,8a4,4 0,1 0,8 0a4,4 0,1 0,-8 0M15,17l9,-2 8,9h9M24,15l-7,15 12,4 4,9M17,30l-6,10H4M15,17l-5,8",
+            "category_characters" to "M8,9c10,5 22,5 32,0v15c0,11 -8,17 -16,20C16,41 8,35 8,24V9ZM14,22l6,-2m8,0 6,2M17,31q7,7 14,0",
+            "category_silent" to "M16,36C8,31 7,19 11,12c4,-7 15,-9 22,-4 6,4 8,11 6,18M15,19h2m12,0h2M24,43V25a3,3 0,0 1,6 0v7l5,-1c4,0 5,3 4,6l-2,6M17,30h6",
+            "category_food" to "M7,5v12c0,5 12,5 12,0V5M13,5v38M28,6h13l-2,16c-1,7 -8,7 -9,0L28,6ZM34.5,27v15M28,43h13M30,17h9",
         )
         val drawableRoot = File("src/main/res/drawable")
-        assertEquals("Only the three original category XML resources are approved", originals.keys,
+        assertEquals("Only the six approved original category XML resources are allowed", originals.keys,
             drawableRoot.listFiles().orEmpty().filter { it.name.startsWith("category_") }.map { it.nameWithoutExtension }.toSet())
         val factory = DocumentBuilderFactory.newInstance().apply {
             isNamespaceAware = true

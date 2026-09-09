@@ -19,6 +19,7 @@ import org.junit.rules.TestRule
 import org.junit.runner.Description
 import org.junit.runner.RunWith
 import org.junit.runners.model.Statement
+import java.util.Locale
 
 @RunWith(AndroidJUnit4::class)
 class GameplayFlowTest : OffTheTopUiTest() {
@@ -131,7 +132,8 @@ class GameplayFlowTest : OffTheTopUiTest() {
     fun everyDeckOpensItsOwnPractice_withoutScoringOrUsingCards() {
         useTouchControls()
         val decks = onModel { it.decks.toList() }
-        assertEquals(listOf("Wild World", "Everyday Things", "Do Your Thing"), decks.map { it.title })
+        assertEquals(listOf("Wild World", "Everyday Things", "Do Your Thing", "Characters", "Silent Acting", "Food & Drink"),
+            decks.map { it.title })
         for (deck in decks) {
             chooseDeck(deck.title)
             compose.onNodeWithText(deck.title).assertIsDisplayed()
@@ -140,6 +142,10 @@ class GameplayFlowTest : OffTheTopUiTest() {
                 .assertTextEquals("Touch controls")
             compose.onNodeWithTag("round-options").assertIsDisplayed()
                 .assertTextEquals("60s · ${deck.words.size} unseen")
+            assertEquals("Only Silent Acting changes the clue-giving rule", deck.id == "silent-acting", deck.silentActing)
+            if (deck.silentActing) {
+                compose.onNodeWithTag("silent-rule").performScrollTo().assertIsDisplayed().assertTextEquals(SILENT_RULE)
+            } else compose.onNodeWithTag("silent-rule").assertDoesNotExist()
             compose.onNodeWithText("Start round").assertIsEnabled()
             compose.onNodeWithTag("word").assertDoesNotExist()
             compose.onNodeWithTag("live-score").assertDoesNotExist()
@@ -196,6 +202,7 @@ class GameplayFlowTest : OffTheTopUiTest() {
 /** Shared only by these instrumented tests; always hosts the real MainActivity. */
 abstract class OffTheTopUiTest {
     protected val compose = createAndroidComposeRule<MainActivity>()
+    private lateinit var bundledDecks: List<Deck>
 
     // An ordinary @Before runs AFTER ActivityScenarioRule launches the activity. This
     // outer rule commits the clear first, before AppModel can read stale preferences.
@@ -204,6 +211,7 @@ abstract class OffTheTopUiTest {
 
     @Before
     fun awaitFreshActivity() {
+        bundledDecks = onModel { it.decks.toList() }
         awaitHome()
         onModel { model ->
             assertEquals(Screen.HOME, model.screen)
@@ -233,14 +241,101 @@ abstract class OffTheTopUiTest {
     }
 
     protected fun chooseDeck(title: String) {
-        val deck = onModel { model -> model.decks.single { it.title == title } }
-        // All stacks exist in the horizontal scroll Row; it has ScrollBy, not
-        // LazyColumn's ScrollToIndex/ScrollToNode actions. Titles use printed line breaks.
-        compose.onNodeWithTag("deck-${deck.id}").performScrollTo().assertIsDisplayed()
+        val deck = showDeck(title)
+        compose.onNodeWithTag("deck-${deck.id}").assertIsDisplayed()
             .assertContentDescriptionEquals("Choose ${deck.title}, ${deck.words.size} cards")
             .assertHasClickAction().performClick()
         awaitText("Start round")
         onModel { assertEquals(title, it.selected.title) }
+    }
+
+    protected fun showDeck(title: String): Deck {
+        val index = bundledDecks.indexOfFirst { it.title == title }
+        assertTrue("Unknown deck: $title", index >= 0)
+        val (_, pages) = deckPage()
+        val perPage = (bundledDecks.size + pages - 1) / pages
+        goToDeckPage(index / perPage)
+        return bundledDecks[index]
+    }
+
+    /** Navigate the real page buttons; HorizontalPager does not support performScrollTo. */
+    protected fun goToDeckPage(target: Int) {
+        val (_, pages) = deckPage()
+        assertTrue("Requested deck page must exist", target in 0 until pages)
+        repeat(pages) {
+            val (current, _) = deckPage()
+            if (current == target) {
+                assertCurrentDeckPage()
+                return
+            }
+            val next = current + if (target > current) 1 else -1
+            compose.onNodeWithTag(if (target > current) "next-decks" else "previous-decks")
+                .assertIsDisplayed().assertIsEnabled().assertHasClickAction().performClick()
+            awaitDeckPage(next, pages)
+        }
+        assertEquals("Page navigation did not reach its target", target, deckPage().first)
+        assertCurrentDeckPage()
+    }
+
+    protected fun deckPage(): Pair<Int, Int> {
+        val label = compose.onNodeWithTag("deck-page").assertIsDisplayed().fetchSemanticsNode()
+            .config[SemanticsProperties.Text].single().text
+        val match = checkNotNull(Regex("([1-3]) / ([2-3])").matchEntire(label)) { "Unexpected page indicator: $label" }
+        return match.groupValues[1].toInt() - 1 to match.groupValues[2].toInt()
+    }
+
+    protected fun awaitDeckPage(page: Int, total: Int) {
+        compose.waitUntil(timeoutMillis = 10_000) {
+            compose.onAllNodes(hasTestTag("deck-page") and hasText("${page + 1} / $total"))
+                .fetchSemanticsNodes().size == 1
+        }
+        compose.waitForIdle() // Wait for the slide to settle, not just currentPage's midpoint update.
+        assertEquals(page to total, deckPage())
+        onModel { assertEquals("The model must remember the displayed page", page, it.deckPage) }
+    }
+
+    protected fun assertCurrentDeckPage(): List<Deck> {
+        val (page, total) = deckPage()
+        assertTrue(page in 0 until total)
+        val perPage = (bundledDecks.size + total - 1) / total
+        val visible = bundledDecks.chunked(perPage)[page]
+        val pagerBounds = compose.onNodeWithTag("deck-list").fetchSemanticsNode().boundsInRoot
+        bundledDecks.forEach { deck ->
+            val node = compose.onNodeWithTag("deck-${deck.id}")
+            if (deck in visible) {
+                node.assertIsDisplayed().assertHasClickAction()
+                    .assertTextEquals(printedDeckTitle(deck.id), "${deck.words.size} cards")
+                    .assertContentDescriptionEquals("Choose ${deck.title}, ${deck.words.size} cards")
+                compose.onAllNodesWithContentDescription("Choose ${deck.title}, ${deck.words.size} cards")
+                    .assertCountEquals(1)
+                val actual = node.fetchSemanticsNode()
+                val bounds = actual.boundsInRoot
+                assertEquals("${deck.title} must not be horizontally clipped", actual.size.width.toFloat(), bounds.width, 1f)
+                assertEquals("${deck.title} must not be vertically clipped", actual.size.height.toFloat(), bounds.height, 1f)
+                assertTrue("The whole ${deck.title} stack must fit its page", bounds.width > 0 && bounds.height > 0 &&
+                    bounds.left >= pagerBounds.left && bounds.right <= pagerBounds.right &&
+                    bounds.top >= pagerBounds.top && bounds.bottom <= pagerBounds.bottom)
+            } else node.assertIsNotDisplayed()
+        }
+        compose.onNodeWithTag("deck-page").assertContentDescriptionEquals("Deck page ${page + 1} of $total")
+        val previous = compose.onNodeWithTag("previous-decks").assertIsDisplayed().assertHasClickAction()
+            .assertContentDescriptionEquals("Previous decks")
+        val next = compose.onNodeWithTag("next-decks").assertIsDisplayed().assertHasClickAction()
+            .assertContentDescriptionEquals("Next decks")
+        if (page == 0) previous.assertIsNotEnabled() else previous.assertIsEnabled()
+        if (page == total - 1) next.assertIsNotEnabled() else next.assertIsEnabled()
+        onModel { assertEquals(page, it.deckPage) }
+        return visible
+    }
+
+    protected fun printedDeckTitle(id: String): String = when (id) {
+        "wild-world" -> "WILD\nWORLD"
+        "everyday" -> "EVERYDAY\nTHINGS"
+        "do-your-thing" -> "DO YOUR\nTHING"
+        "characters" -> "CHARACTERS"
+        "silent-acting" -> "SILENT\nACTING"
+        "food-drink" -> "FOOD &\nDRINK"
+        else -> error("Unknown test deck: $id")
     }
 
     protected fun awaitHome() {
@@ -249,6 +344,7 @@ abstract class OffTheTopUiTest {
         compose.onNodeWithTag("deck-list").assertIsDisplayed()
             .assertContentDescriptionEquals("Choose a deck")
         compose.onNodeWithText("Choose a deck").assertDoesNotExist()
+        assertCurrentDeckPage()
     }
 
     protected fun useTouchControls() {
@@ -283,7 +379,9 @@ abstract class OffTheTopUiTest {
         val number = compose.onNodeWithTag("countdown").fetchSemanticsNode()
             .config[SemanticsProperties.Text].single().text.toInt()
         assertTrue("Countdown must display 3, 2 or 1", number in 1..3)
-        compose.onNodeWithText("Hold still at your forehead").assertIsDisplayed()
+        val silent = onModel { it.selected.silentActing }
+        compose.onNodeWithText(if (silent) SILENT_COUNTDOWN else "Hold still at your forehead").assertIsDisplayed()
+        compose.onNodeWithText(if (silent) "Hold still at your forehead" else SILENT_COUNTDOWN).assertDoesNotExist()
         compose.onNodeWithTag("word").assertDoesNotExist()
         compose.onNodeWithTag("correct").assertDoesNotExist()
         compose.onNodeWithTag("pass").assertDoesNotExist()
@@ -358,8 +456,14 @@ abstract class OffTheTopUiTest {
             .assertContentDescriptionEquals("$word, $description")
     }
 
-    protected fun seenWords(deckId: String): Set<String> = preferences()
-        .getStringSet("seen-$deckId", emptySet()).orEmpty().toSet()
+    protected fun seenWords(deckId: String): Set<String> {
+        val global = preferences().getStringSet("seen-shared-v1", emptySet()).orEmpty()
+            .map { it.trim().lowercase(Locale.ROOT) }.toSet()
+        // Keep the old assertions' original casing, while filtering the shared memory
+        // to this deck. The cached catalog also avoids nested UI-thread synchronization.
+        return bundledDecks.single { it.id == deckId }.words
+            .filter { it.trim().lowercase(Locale.ROOT) in global }.toSet()
+    }
 
     protected fun preferences() = InstrumentationRegistry.getInstrumentation().targetContext
         .getSharedPreferences("off-the-top", Context.MODE_PRIVATE)
@@ -395,6 +499,8 @@ abstract class OffTheTopUiTest {
 
     protected companion object {
         const val EMPTY_HISTORY = "No rounds yet"
+        const val SILENT_RULE = "Clue givers: act without speaking.\nGuesser: say your answer."
+        const val SILENT_COUNTDOWN = "Hold still. Clues are acted, not spoken."
     }
 }
 

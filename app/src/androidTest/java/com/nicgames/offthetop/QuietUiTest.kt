@@ -32,16 +32,12 @@ class QuietUiTest : OffTheTopUiTest() {
         assertNoCopy("THE FOREHEAD GUESSING GAME", "Good clues.", "One phone.", "ALL OFFLINE", "NO ADS")
 
         val decks = onModel { it.decks.toList() }
-        assertEquals(3, decks.size)
+        assertEquals(6, decks.size)
         decks.forEach { deck ->
-            val printedTitle = when (deck.id) {
-                "wild-world" -> "WILD\nWORLD"
-                "everyday" -> "EVERYDAY\nTHINGS"
-                else -> "DO YOUR\nTHING"
-            }
-            compose.onNodeWithTag("deck-${deck.id}").performScrollTo()
+            showDeck(deck.title)
+            compose.onNodeWithTag("deck-${deck.id}")
                 .assertIsDisplayed().assertHasClickAction()
-                .assertTextEquals(printedTitle, "${deck.words.size} cards")
+                .assertTextEquals(printedDeckTitle(deck.id), "${deck.words.size} cards")
                 .assertContentDescriptionEquals("Choose ${deck.title}, ${deck.words.size} cards")
             compose.onAllNodesWithTag("category-${deck.id}", useUnmergedTree = true).assertCountEquals(2)
             assertNoCopy(deck.subtitle, deck.examples, "Nature", "Objects & food", "Actions & places")

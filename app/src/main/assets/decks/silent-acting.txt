@@ -1,0 +1,591 @@
+# SILENT ACTING
+# Clue givers mime silently; the guesser may speak.
+# Prompt topics only: mime activities, not real stunts.
+
+# Reused Verbatim From Do Your Thing
+
+# Personal Routines
+Waking Up
+Hitting Snooze
+Brushing Teeth
+Flossing
+Taking A Shower
+Soaking In A Bath
+Washing Your Face
+Shaving
+Combing Your Hair
+Blow-Drying Your Hair
+Putting On Makeup
+Painting Your Nails
+Putting In Contact Lenses
+Applying Sunscreen
+Tying Shoelaces
+Zipping Up A Jacket
+Tying A Necktie
+Putting On Earrings
+Rolling Up Your Sleeves
+Checking Your Reflection
+Weighing Yourself
+Taking Medicine
+Taking Your Temperature
+Bandaging A Finger
+Setting An Alarm
+Counting Sheep
+Sleepwalking
+Snoring
+Taking A Nap
+
+# Housework And Home Repairs
+Making The Bed
+Fluffing A Pillow
+Folding Laundry
+Hanging Laundry
+Ironing A Shirt
+Matching Socks
+Scrubbing A Toilet
+Mopping The Floor
+Vacuuming
+Dusting A Shelf
+Washing Windows
+Taking Out The Trash
+Sorting Recycling
+Unblocking A Drain
+Changing A Light Bulb
+Hanging A Picture
+Assembling Furniture
+Painting A Wall
+Stripping Wallpaper
+Fixing A Leaky Tap
+Hammering A Nail
+Drilling A Hole
+Sanding Wood
+Measuring A Room
+Moving A Sofa
+Rolling Up A Rug
+Shaking Out A Doormat
+Testing A Smoke Alarm
+Sweeping The Floor
+Packing A Moving Box
+
+# Cooking And Mealtimes
+Baking A Cake
+Kneading Dough
+Rolling Out Pastry
+Cracking An Egg
+Flipping A Pancake
+Whisking Cream
+Chopping An Onion
+Peeling A Potato
+Grating Cheese
+Squeezing A Lemon
+Tossing A Salad
+Stirring Soup
+Blowing On Hot Food
+Licking The Spoon
+Setting The Table
+Washing Dishes
+Loading The Dishwasher
+Making A Packed Lunch
+Pouring Tea
+Grinding Coffee
+Opening A Jar
+Uncorking A Bottle
+Using Chopsticks
+Twirling Spaghetti
+Spreading Butter
+Decorating Cupcakes
+Burning Toast
+Spilling A Drink
+Carrying A Full Tray
+Doing A Taste Test
+
+# Getting Around
+Missing The Bus
+Hailing A Taxi
+Riding An Escalator
+Squeezing Onto A Crowded Train
+Fastening A Seat Belt
+Parallel Parking
+Getting Stuck In Traffic
+Reading A Street Map
+Pumping Up A Bicycle Tire
+Changing A Flat Tire
+Filling Up With Gas
+Checking The Oil
+Washing A Car
+Pushing A Broken-Down Car
+Paying A Parking Meter
+Riding In An Elevator
+Getting A Parking Ticket
+Giving Up Your Seat
+Helping Someone Cross The Road
+Looking For Your Car
+Rolling Down A Car Window
+Putting On A Helmet
+Locking A Bicycle
+Going Through A Turnstile
+
+# Travel And Days Out
+Packing A Suitcase
+Going Through Airport Security
+Waiting At Baggage Claim
+Getting Seasick
+Pitching A Tent
+Rolling Up A Sleeping Bag
+Toasting Marshmallows
+Building A Sandcastle
+Posing For A Holiday Photo
+Riding A Roller Coaster
+Getting Lost In A Maze
+Sliding Down A Water Slide
+Going On A Picnic
+
+# Shopping And Errands
+Pushing A Shopping Cart
+Trying On Shoes
+Testing A Mattress
+Getting A Haircut
+Clipping Coupons
+Paying With Loose Change
+Carrying Too Many Bags
+Using A Self-Checkout
+Posting A Parcel
+Getting An Eye Test
+Having A Dental Checkup
+Looking At Paint Samples
+
+# Work And School
+Taking An Exam
+Raising Your Hand
+Passing A Note
+Writing On A Whiteboard
+Sharpening A Pencil
+Falling Asleep In Class
+Looking Through A Microscope
+Graduating
+Joining A Video Call
+Typing An Email
+Fixing A Paper Jam
+Making Photocopies
+Answering The Phone
+
+# Celebrations And Social Moments
+Blowing Out Birthday Candles
+Wrapping A Present
+Blowing Up A Balloon
+Hanging Party Decorations
+Lighting A Sparkler
+Pulling A Party Popper
+Making A Toast
+Cutting A Wedding Cake
+Proposing Marriage
+Walking Down The Aisle
+Catching The Bouquet
+Slow Dancing
+Playing Musical Chairs
+Joining A Conga Line
+Holding Hands
+Sharing An Umbrella
+Photobombing
+Laughing At The Wrong Moment
+
+# Everyday Mishaps
+Locking Yourself Out
+Losing Your Keys
+Dropping Your Phone
+Waving At The Wrong Person
+Wearing Mismatched Shoes
+Putting A Shirt On Backward
+Getting Gum On Your Shoe
+Stepping In A Puddle
+Being Caught In The Rain
+Wrestling With An Umbrella
+Slipping On Ice
+Tripping Over A Curb
+Bumping Your Head
+Getting A Paper Cut
+Getting A Splinter
+Having The Hiccups
+Sneezing At A Quiet Moment
+Unjamming A Zipper
+Dropping A Coin Down A Drain
+Sitting On Wet Paint
+Getting Stuck In An Elevator
+Burning Your Tongue
+Ringing The Wrong Doorbell
+Walking Into A Glass Door
+
+# Gestures And Movements
+Winking
+Nodding
+Shaking Your Head
+Shrugging
+Rolling Your Eyes
+Raising An Eyebrow
+Sticking Out Your Tongue
+Puffing Out Your Cheeks
+Pouting
+Yawning
+Whistling
+Snapping Your Fingers
+Clapping
+Giving A Thumbs-Up
+High-Fiving
+Fist Bumping
+Crossing Your Fingers
+Knocking On Wood
+Saluting
+Bowing
+Curtsying
+Tiptoeing
+Marching
+Crawling
+Limping
+Hopping On One Foot
+Walking On A Tightrope
+Doing A Cartwheel
+Standing On Your Head
+Sucking In Your Stomach
+
+# Family And Community Life
+Walking A Dog
+Rocking A Baby To Sleep
+Changing A Diaper
+Pushing A Stroller
+Burping A Baby
+Feeding A Toddler
+Teaching A Child To Ride A Bike
+Building A Blanket Fort
+Playing Peekaboo
+Playing Hide-And-Seek
+Jumping In A Ball Pit
+Pushing Someone On A Swing
+Riding A Seesaw
+Reading A Bedtime Story
+Giving A Piggyback Ride
+Tucking Someone Into Bed
+Making Shadow Puppets
+Picking Up Litter
+Planting A Community Garden
+Cheering From The Sidelines
+Doing The Wave
+Watching A Movie
+Reading The Newspaper
+Skipping A Stone
+Flying A Kite
+
+# Jobs In Health, Education, And Care
+Doctor
+Nurse
+Surgeon
+Dentist
+X-Ray Technician
+Paramedic
+Pharmacist
+Optician
+Physiotherapist
+Veterinarian
+Teacher
+Driving Instructor
+Librarian
+Babysitter
+Personal Trainer
+Lifeguard
+Sign Language Interpreter
+
+# Jobs In Trades And Construction
+Builder
+Carpenter
+Plumber
+Electrician
+Bricklayer
+Roofer
+Welder
+Mechanic
+Locksmith
+Plasterer
+Carpet Installer
+Chimney Sweep
+Pest Controller
+Gardener
+Tree Surgeon
+Architect
+Surveyor
+Crane Operator
+Road Worker
+Miner
+Factory Worker
+Blacksmith
+Tailor
+
+# Jobs In Food, Service, And Travel
+Chef
+Baker
+Butcher
+Fishmonger
+Barista
+Bartender
+Waiter
+Flight Attendant
+Pilot
+Train Conductor
+Bus Driver
+Taxi Driver
+Ship Captain
+Sailor
+Postal Worker
+Cashier
+Hairdresser
+Florist
+
+# Jobs In Public Service And Creative Work
+Firefighter
+Police Officer
+Crossing Guard
+Security Guard
+Detective
+Judge
+Cartoonist
+Scientist
+Astronaut
+Archaeologist
+Journalist
+Weather Presenter
+Photographer
+Film Director
+Magician
+Circus Acrobat
+Sports Referee
+
+# Sports
+Playing Soccer
+Playing Basketball
+Playing Baseball
+Playing Volleyball
+Playing Rugby
+Playing Cricket
+Playing Tennis
+Playing Badminton
+Playing Table Tennis
+Playing Ice Hockey
+Archery
+Fencing
+Boxing
+Wrestling
+Judo
+Karate
+Golf
+Bowling
+Curling
+Dodgeball
+Swimming
+Springboard Diving
+Surfing
+Sailing
+Rowing
+Kayaking
+Water Skiing
+Downhill Skiing
+Snowboarding
+Ice Skating
+Skateboarding
+Roller Skating
+Cycling
+Horse Riding
+Rock Climbing
+
+# Fitness And Outdoor Adventures
+Yoga
+Weightlifting
+Running A Marathon
+Pole Vaulting
+Doing The Long Jump
+Hurdling
+Jumping Rope
+Hula Hooping
+Bungee Jumping
+Skydiving
+Scuba Diving
+Snorkeling
+Zip-Lining
+Hiking
+Fishing
+
+# Crafts, Games, And Performing Arts
+Knitting
+Crocheting
+Embroidery
+Pottery
+Origami
+Woodcarving
+Building A Model Railway
+Stamp Collecting
+Doing A Crossword
+Solving A Jigsaw Puzzle
+Playing Chess
+Playing Poker
+Playing Darts
+Singing Karaoke
+Tap Dancing
+Ballet
+Juggling
+Calligraphy
+Painting A Portrait
+Playing The Guitar
+Conducting An Orchestra
+
+# New Prompts
+
+# More Routines And Home Tasks
+Removing A Stuck Ring
+Plucking Your Eyebrows
+Gargling
+Applying Deodorant
+Cutting Your Toenails
+Pulling On Tight Jeans
+Pulling Off A Stuck Boot
+Buttoning A Shirt
+Cleaning Your Glasses
+Putting On A Wig
+Threading A Belt
+Opening Curtains
+Watering Houseplants
+Changing Batteries
+Using A Lint Roller
+Cleaning An Oven
+Fixing A Wobbly Table
+Catching A Spider In A Cup
+Using A Sewing Machine
+Untangling Christmas Lights
+Shredding Paper
+Cleaning A Fish Tank
+Folding A Step Ladder
+Rewinding A Tape
+
+# More Food And Kitchen Actions
+Sifting Flour
+Draining Pasta
+Tossing Pizza Dough
+Eating Corn On The Cob
+Cracking A Nut
+Eating A Melting Ice Cream
+Drinking From A Coconut
+Chewing Sticky Toffee
+Biting Into A Sour Lemon
+Eating A Giant Sandwich
+Chasing A Rolling Grape
+Using A Can Opener
+Mashing Potatoes
+Carving A Pumpkin
+Peeling A Banana
+Popping Popcorn
+
+# More Body Movements And Gestures
+Touching Your Toes
+Doing Push-Ups
+Doing Sit-Ups
+Doing Squats
+Doing Jumping Jacks
+Walking Backward
+Walking In Slow Motion
+Crab Walking
+Waddling Like A Penguin
+Flapping Like A Bird
+Galloping Like A Horse
+Moving Like A Robot
+Pecking Like A Chicken
+Balancing A Book On Your Head
+Patting Your Head And Rubbing Your Belly
+Flexing Your Muscles
+Blowing A Kiss
+Wagging A Finger
+Beckoning
+Looking Over Your Shoulder
+Covering Your Ears
+Holding Your Nose
+Rubbing Your Hands Together
+Drumming Your Fingers
+Making A Heart With Your Hands
+Shivering
+Fanning Yourself
+Sucking Your Thumb
+Skipping Along
+
+# More Physical Jobs
+Farmer
+Beekeeper
+Dog Groomer
+Glassblower
+Shoemaker
+Puppeteer
+DJ
+Zookeeper
+
+# More Sports, Games, And Music
+Playing Lacrosse
+Playing Squash
+Playing American Football
+Playing Frisbee
+Playing Horseshoes
+Croquet
+Playing Hopscotch
+Playing Leapfrog
+Playing Tug-Of-War
+Racing In A Sack
+Balancing An Egg On A Spoon
+Arm Wrestling
+Riding A Unicycle
+Paddleboarding
+Playing Pinball
+Playing Foosball
+Playing A Video Game
+Stacking Playing Cards
+Playing The Piano
+Playing The Drums
+Playing The Violin
+Playing The Trumpet
+Playing The Accordion
+Playing The Harp
+Bouncing On A Trampoline
+Riding A Pogo Stick
+
+# More Physical Mishaps And Funny Moments
+Getting Caught In A Spiderweb
+Chasing A Runaway Hat
+Trying Not To Wake A Baby
+Swatting A Mosquito
+Having A Stiff Neck
+Squeezing Through A Narrow Gap
+Walking Against A Strong Wind
+Trying To Catch A Feather
+Being Tickled
+Getting Brain Freeze
+Finding A Worm In An Apple
+Discovering A Hole In Your Pocket
+Lifting A Heavy Box
+Opening A Shaken Soda
+Peeling Off A Sticky Price Label
+Getting Tangled In Cling Film
+Catching A Falling Plate
+Trying To Open A Stuck Window
+Getting Shampoo In Your Eyes
+Catching Your Breath
+Getting Sand In Your Shoes
+Catching Snowflakes On Your Tongue
+
+# More Outdoor And Hands-On Activities
+Blowing Bubbles
+Using A Magnifying Glass
+Looking Through Binoculars
+Using A Metal Detector
+Milking A Cow
+Raking Leaves
+Shoveling Snow
+Digging For Buried Treasure
+Picking Fruit
+Collecting Eggs
+Feeding Chickens
+Opening A Deckchair
+Starting A Lawn Mower
+Stretching A Rubber Band
+Scooping Water With Your Hands

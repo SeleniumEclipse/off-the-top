@@ -26,11 +26,14 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -41,6 +44,9 @@ import androidx.compose.ui.unit.sp
         "wild-world" -> R.drawable.category_wild
         "everyday" -> R.drawable.category_everyday
         "do-your-thing" -> R.drawable.category_actions
+        "characters" -> R.drawable.category_characters
+        "silent-acting" -> R.drawable.category_silent
+        "food-drink" -> R.drawable.category_food
         else -> error("Unknown category: $deckId")
     }
     Icon(painterResource(asset), contentDescription = null, tint = tint, modifier = modifier.testTag("category-$deckId"))
@@ -99,6 +105,35 @@ import androidx.compose.ui.unit.sp
         val compact = maxHeight < 160.dp
         val availableWidth = maxWidth
         val availableHeight = maxHeight
+        val density = LocalDensity.current
+        val measurer = rememberTextMeasurer()
+        val title = when (deck.id) {
+            "wild-world" -> "WILD\nWORLD"
+            "everyday" -> "EVERYDAY\nTHINGS"
+            "do-your-thing" -> "DO YOUR\nTHING"
+            "characters" -> "CHARACTERS"
+            "silent-acting" -> "SILENT\nACTING"
+            "food-drink" -> "FOOD &\nDRINK"
+            else -> deck.title.uppercase()
+        }
+        val titleLines = title.count { it == '\n' } + 1
+        // The enclosing Column centers this label; keep its own line start-aligned.
+        val countStyle = TextStyle(fontFamily = Body, fontSize = 13.sp, lineHeight = 16.sp)
+        val titleStyle = remember(title, availableWidth, availableHeight, density) {
+            val width = with(density) { (availableWidth - 37.dp).roundToPx().coerceAtLeast(0) }
+            val count = measurer.measure("${deck.words.size} cards", countStyle,
+                constraints = androidx.compose.ui.unit.Constraints(maxWidth = width))
+            val height = with(density) { (availableHeight - 5.dp - (if (compact) 64.dp else 84.dp) - (if (compact) 5.dp else 12.dp)).roundToPx() } - count.size.height
+            val bounds = androidx.compose.ui.unit.Constraints(maxWidth = width, maxHeight = height.coerceAtLeast(0))
+            var size = if (compact) 21 else 27
+            var style: TextStyle
+            do {
+                style = TextStyle(fontFamily = Headline, fontSize = size.sp, lineHeight = (size * 1.08f).sp, textAlign = TextAlign.Center)
+                if (!measurer.measure(title, style, maxLines = titleLines, softWrap = false, constraints = bounds).hasVisualOverflow || size <= 8) break
+                size--
+            } while (true)
+            style
+        }
         RedCardBack(Modifier.matchParentSize().graphicsLayer { rotationZ = -5f; translationX = -5.dp.toPx() })
         CardFace(Modifier.fillMaxSize()) {
             val markSize = if (compact) 24.dp else 30.dp
@@ -107,13 +142,9 @@ import androidx.compose.ui.unit.sp
             CategoryIcon(deck.id, Modifier.align(Alignment.BottomEnd).padding(10.dp).size(markSize).graphicsLayer { rotationZ = 180f }, markColor)
             Column(Modifier.fillMaxSize().padding(horizontal = 16.dp, vertical = if (compact) 32.dp else 42.dp),
                 horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-                val title = when (deck.id) { "wild-world" -> "WILD\nWORLD"; "everyday" -> "EVERYDAY\nTHINGS"; else -> "DO YOUR\nTHING" }
-                var fontSize by remember(deck.id, availableWidth, availableHeight) { mutableStateOf(if (compact) 21 else 27) }
-                Text(title, fontFamily = Headline, fontSize = fontSize.sp, lineHeight = (fontSize * 1.08f).sp,
-                    textAlign = TextAlign.Center, color = p.cardInk, maxLines = 2,
-                    onTextLayout = { if (it.hasVisualOverflow && fontSize > 12) fontSize -= 1 })
+                Text(title, style = titleStyle, color = p.cardInk, maxLines = titleLines, softWrap = false, onTextLayout = {})
                 Spacer(Modifier.height(if (compact) 5.dp else 12.dp))
-                Text("${deck.words.size} cards", fontFamily = Body, fontSize = 13.sp, color = p.cardMuted)
+                Text("${deck.words.size} cards", style = countStyle, color = p.cardMuted)
             }
         }
     }
